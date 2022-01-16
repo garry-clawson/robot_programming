@@ -35,7 +35,7 @@ class Mover:
         if min_dist < 2:
             t.angular.z = 1.0
         else:
-            t.linear.x = 0.8
+            t.linear.x = 2
         self.publisher.publish(t)
 
 if __name__ == '__main__':
