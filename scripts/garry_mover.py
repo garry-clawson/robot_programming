@@ -47,7 +47,7 @@ class Mover:
         # publish it later. All initialised to 0!
         t = Twist()
 
-        # If anything is closer than 4 metres anywhere in the
+        # If anything is closer than 2 metres anywhere in the
         # scan, we turn away
         if min_dist < 2:
             t.angular.z = 1.0
@@ -140,5 +140,11 @@ if __name__ == '__main__':
     # Create the Mover object 
     # (which in turns registers the subscriber and make the system go)
     Mover()
-    # Finally, keep going until we are interrupted.
-    rospy.spin()
+    # Enable mover to be killed and screens removed
+    print('--------- mover has started -----------')
+        try:
+            rospy.spin() # run mover until stopped 
+        except KeyboardInterrupt:
+            print "Shutting down"
+        print('----- mover exiting -----')
+        cv2.destroyAllWindows() # destroy all opencv windows when killing node
