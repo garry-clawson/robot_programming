@@ -53,24 +53,67 @@ class image_listener:
         #Remove background
         HSVimage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV) # convert color space
         # between values for thresholding
-        min = np.array([043, 000, 000]) 
+        min = np.array([35, 000, 000]) 
         max = np.array([180, 253, 255]) 
+        
         mask = cv2.inRange(HSVimage, min, max) # threshold
-        cropimage = cv2.bitwise_and(HSVimage, HSVimage, mask=mask) # obtain threshold result
-        im_NoBackground = cv2.cvtColor(cropimage, cv2.COLOR_HSV2BGR) # reconvert color space for publishing
+        #self.saveImage(mask)
+
+        bunch_image = cv2.bitwise_and(HSVimage, HSVimage, mask=mask) # obtain threshold result
+        #self.saveImage(bunch_image)
+
+        im_NoBackground = cv2.cvtColor(bunch_image, cv2.COLOR_HSV2BGR) # reconvert color space for publishing
+        
         return im_NoBackground
 
 
     def removeVines(self, image):
-        BLURogimage = cv2.GaussianBlur(image,(35,35),0) # blur to remove details
-        HSVimage = cv2.cvtColor(BLURogimage, cv2.COLOR_BGR2HSV)   # convert color space for thresholding
-        # mask out vine 
-        min = np.array([035, 000, 000]) 
-        max = np.array([180, 129, 254]) 
+
+        HSVimage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)   # convert color space for thresholding
+        cv2.imshow("hasImage", HSVimage)
+        cv2.waitKey(0) 
+        # mask out vine - values found by using hsv_range_detector.py, inspired by https://www.youtube.com/watch?v=We6CQHhhOFo&t=136s  -> ROS and OpenCv for beginners | Blob Tracking and Ball Chasing with Raspberry Pi by Tiziano Fiorenzani
+        min = np.array([95, 000, 46])
+        max = np.array([255, 255, 255]) 
         vinemask = cv2.inRange(HSVimage, min, max) # threshold
-        vinemask = cv2.morphologyEx(vinemask, cv2.MORPH_OPEN, np.ones((8, 8))) # remove small white dots
+        cv2.imshow("vinemask", vinemask)
+        cv2.waitKey(0) 
+        #self.saveImage(vinemask)
+        
+        vinemask = cv2.dilate(vinemask, np.ones((10, 10))) # expand mask
+        cv2.imshow("diliated", vinemask)
+        cv2.waitKey(0) 
+
+        # Add kernal to complete the morphEx operation using morph_elispse (simular shape to grapes)
+        # Inspired by -> https://www.pyimagesearch.com/2021/04/28/opencv-morphological-operations/
+        #kernelSize = [(5, 5)] 
+        #kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, kernelSize)
+        #vinemask = cv2.morphologyEx(vinemask, cv2.MORPH_OPEN, kernal) # remove small white dots
+        #self.saveImage(vinemask)
+
+
+        # close all windows to cleanup the screen, then initialize a list of
+        # of kernels sizes that will be applied to the image
+        #kernelSizes = [(1, 1), (2, 2), (3, 3)]
+        # loop over the kernels sizes
+        #for kernelSize in kernelSizes:
+	        #construct a rectangular kernel from the current size and then apply an "opening" operation
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
+        vinemask = cv2.morphologyEx(vinemask, cv2.MORPH_OPEN, kernel)
+        cv2.imshow("final vinemask", vinemask)
+        cv2.waitKey(0)
+
+        # close all windows to cleanup the screen
+        
+
+
+
         # obtain threshold result
         grapeBunchImage = cv2.bitwise_and(HSVimage, HSVimage, mask=vinemask) 
+        cv2.imshow("grapeBunchImage", grapeBunchImage)
+        cv2.waitKey(0) 
+        #self.saveImage(grapeBunchImage)
+        
         return grapeBunchImage
 
     def saveImage(self, image):
