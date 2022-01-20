@@ -4,11 +4,11 @@ These files go in the src folder of your catkin_ws or ros_ws. My folder is curre
 
 To launch the robot, type the following in the terminal (note: using roslaunch instead of rosrun will launch roscore automatically):
 
-`roslaunch rp_assignment_1 garry_mover.launch`
+`roslaunch robot_move robot_move.launch`
 
 This will call the package and the associated laucnh file. This launch file consists of two simple elements:
 
-1) The node details for the garry_mover.py
+1) The node details for the robot_move.py
 
 2) An <include> which finds the bacchus_gazebo vineyard demo launch
 
