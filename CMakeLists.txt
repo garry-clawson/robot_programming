@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(rp_assignment_1)
+project(grape_bunch_counter)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -122,7 +122,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/rp_assignment_1.cpp
+#   src/${PROJECT_NAME}/robot_move.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -160,7 +160,9 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
  catkin_install_python(PROGRAMS
-   scripts/garry_mover.py
+   scripts/robot_move.py
+   scripts/image_saver.py
+   scripts/opencv_test.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 

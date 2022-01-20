@@ -136,15 +136,15 @@ class Mover:
 
 if __name__ == '__main__':
     # as usual, initialise the ROS node with a name
-    rospy.init_node('mover')
-    # Create the Mover object 
+    rospy.init_node('robot_move')
+    # Create the robot move object 
     # (which in turns registers the subscriber and make the system go)
     Mover()
     # Enable mover to be killed and screens removed
     print('--------- mover has started -----------')
-        try:
-            rospy.spin() # run mover until stopped 
-        except KeyboardInterrupt:
-            print "Shutting down"
+    try:
+        rospy.spin() # run mover until stopped 
+    except KeyboardInterrupt:
+        print "Shutting down"
         print('----- mover exiting -----')
         cv2.destroyAllWindows() # destroy all opencv windows when killing node

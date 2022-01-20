@@ -1,5 +1,5 @@
 <launch>
-  <node name="garry_mover" pkg="rp_assignment_1" type="garry_mover.py" output="screen"/>
+  <node name="robot_move" pkg="grape_bunch_counter" type="robot_move.py" output="screen"/>
 
   <include file="$(find bacchus_gazebo)/launch/vineyard_demo.launch"/>
 
