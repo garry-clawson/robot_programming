@@ -4,7 +4,7 @@ These files go in the src folder of your catkin_ws or ros_ws. My folder is curre
 
 To launch the robot, type the following in the terminal (note: using roslaunch instead of rosrun will launch roscore automatically):
 
-`roslaunch robot_move robot_move.launch`
+`roslaunch grape_bunch_counter grape_bunch_counter.launch`
 
 This will call the package and the associated laucnh file. This launch file consists of two simple elements:
 
