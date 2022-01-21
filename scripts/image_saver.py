@@ -11,7 +11,7 @@
 # http://opencv-python-tutroals.readthedocs.org/en/latest/py_tutorials/py_gui/py_image_display/py_image_display.html
 
 # rospy for the subscriber
-import rospy
+import rospy, sys
 # ROS Image message
 from sensor_msgs.msg import Image
 # ROS Image message -> OpenCV2 image converter
@@ -25,13 +25,13 @@ import numpy as np
 from datetime import datetime
 
 
-
-
 class image_listener:
 
     def __init__(self):
 
+        # Enable OpenCV with ROS
         self.bridge = CvBridge()
+        # Subscribe to front camera feed
         self.image_sub = rospy.Subscriber("/thorvald_001/kinect2_front_camera/hd/image_color_rect",
                                           Image, self.image_callback)
 
@@ -46,33 +46,30 @@ class image_listener:
         else:
             img_noBackground = self.removeBackGround(cv2_img) # remove background on start
             img_removeVines = self.removeVines(img_noBackground)
+            
             #self.saveImage(img_removeVines)
 
 
     def removeBackGround(self, image):
-        #Remove background
+        # Remove background
         HSVimage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV) # convert color space
         # between values for thresholding
         min = np.array([35, 000, 000]) 
         max = np.array([180, 253, 255]) 
-        
         mask = cv2.inRange(HSVimage, min, max) # threshold
-        #self.saveImage(mask)
-
         bunch_image = cv2.bitwise_and(HSVimage, HSVimage, mask=mask) # obtain threshold result
-        #self.saveImage(bunch_image)
-
         im_NoBackground = cv2.cvtColor(bunch_image, cv2.COLOR_HSV2BGR) # reconvert color space for publishing
-        
+        cv2.imshow("Removed background", im_NoBackground)
+        cv2.waitKey(0) 
         return im_NoBackground
 
 
     def removeVines(self, image):
-
         HSVimage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)   # convert color space for thresholding
-        cv2.imshow("hasImage", HSVimage)
+        cv2.imshow("HSVImage", HSVimage)
         cv2.waitKey(0) 
-        # mask out vine - values found by using hsv_range_detector.py, inspired by https://www.youtube.com/watch?v=We6CQHhhOFo&t=136s  -> ROS and OpenCv for beginners | Blob Tracking and Ball Chasing with Raspberry Pi by Tiziano Fiorenzani
+        # mask out vine - values found by using hsv_range_detector.py
+        # inspired by https://www.youtube.com/watch?v=We6CQHhhOFo&t=136s  -> ROS and OpenCv for beginners | Blob Tracking and Ball Chasing with Raspberry Pi by Tiziano Fiorenzani
         min = np.array([95, 000, 46])
         max = np.array([255, 255, 255]) 
         vinemask = cv2.inRange(HSVimage, min, max) # threshold
@@ -86,35 +83,60 @@ class image_listener:
 
         # Add kernal to complete the morphEx operation using morph_elispse (simular shape to grapes)
         # Inspired by -> https://www.pyimagesearch.com/2021/04/28/opencv-morphological-operations/
-        #kernelSize = [(5, 5)] 
-        #kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, kernelSize)
-        #vinemask = cv2.morphologyEx(vinemask, cv2.MORPH_OPEN, kernal) # remove small white dots
-        #self.saveImage(vinemask)
-
-
-        # close all windows to cleanup the screen, then initialize a list of
-        # of kernels sizes that will be applied to the image
-        #kernelSizes = [(1, 1), (2, 2), (3, 3)]
-        # loop over the kernels sizes
-        #for kernelSize in kernelSizes:
-	        #construct a rectangular kernel from the current size and then apply an "opening" operation
-        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
-        vinemask = cv2.morphologyEx(vinemask, cv2.MORPH_OPEN, kernel)
-        cv2.imshow("final vinemask", vinemask)
+	    # construct a eliptic kernel (same shape as grapes) from the current size and then apply an "opening" operation to close the gaps
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
+        morph_vinemask = cv2.morphologyEx(vinemask, cv2.MORPH_OPEN, kernel)
+        cv2.imshow("MorphEx vinemask", morph_vinemask)
         cv2.waitKey(0)
 
-        # close all windows to cleanup the screen
-        
-
-
-
         # obtain threshold result
-        grapeBunchImage = cv2.bitwise_and(HSVimage, HSVimage, mask=vinemask) 
-        cv2.imshow("grapeBunchImage", grapeBunchImage)
+        grapeBunchImage = cv2.bitwise_and(HSVimage, HSVimage, mask=morph_vinemask) 
+        cv2.imshow("grapeBunchImage with MorphEx ANDED HSV image", grapeBunchImage)
         cv2.waitKey(0) 
+
+
+
+        # Detect the keypoints of the grape bunches in the image and count them
+        im_detectGrapes_with_keypoints, keypoints = self.detectGrapes(grapeBunchImage, morph_vinemask)
+        cv2.imshow("Final Grape bunch Image", im_detectGrapes_with_keypoints)
+        cv2.waitKey(0)
         #self.saveImage(grapeBunchImage)
         
         return grapeBunchImage
+
+
+    def detectGrapes(self, image, mask):
+        grape_bunch_mask=cv2.bitwise_not(mask) # invert as blob detector will look for black pixels, ours is white
+        #  FROM -> https://www.learnopencv.com/blob-detection-using-opencv-python-c/
+        # Inspired params from -> https://stackoverflow.com/questions/53064534/simple-blob-detector-does-not-detect-blobs 
+        # Note: Need the robot to sdand off so that grape bunches are at the image border - this impacts pixel masking params also!!
+        params = cv2.SimpleBlobDetector_Params() # initialize detection parameters
+        # Inspired also by -> https://programmerall.com/article/3089974703/ 
+        # Filter by area -  Setting minArea = 500 will filter out all spots with less than 500 pixels (HD connect camera)
+        params.filterByArea = True 
+        params.minArea = 1000
+        params.maxArea = sys.maxint
+        # Filter by Circularity - measures how close to a circle the blob is (a hex is closer than a square)
+        params.filterByCircularity = True
+        params.minCircularity = 0
+        # Filter by Convexity - this measures how elongated a shape is
+        params.filterByConvexity = True
+        params.minConvexity = 0
+        # Filter by Inertia
+        params.filterByInertia = True
+        params.minInertiaRatio = 0
+        # Create a detector with the parameters
+        detector = cv2.SimpleBlobDetector_create(params)
+        # Detect blobs.
+        keypoints = detector.detect(grape_bunch_mask)
+        # Draw detected blobs as red circles. cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
+        im_with_keypoints = cv2.drawKeypoints(image, keypoints, np.array([]), (000,000,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        if(len(keypoints) != 0): # If a blob is detected, print out how many
+            print('Keypoints = ',len(keypoints))
+        cv2.imshow("detect keypoints image", im_with_keypoints)
+        cv2.waitKey(0)
+        return im_with_keypoints, keypoints
+
 
     def saveImage(self, image):
         # Save your OpenCV2 image as a jpeg 
