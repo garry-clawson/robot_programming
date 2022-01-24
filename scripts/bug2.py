@@ -23,8 +23,8 @@ class BotState(enum.Enum):
 
 
 yaw = 0
-yaw_threshold = math.pi / 90
-goal_distance_threshold = 0.25
+yaw_threshold = math.pi / 45
+goal_distance_threshold = 0.5
 currentBotState = BotState.LOOK_TOWARDS
 
 # base scan laser range values
@@ -53,7 +53,7 @@ def normalize(angle):
         angle = angle - (2 * math.pi * angle) / (math.fabs(angle))
     return angle
 
-
+# Looks towards the homing beacon position
 def look_towards(des_pos):
     global yaw, yaw_threshold, bot_motion, currentBotState, twist
     quaternion = (
@@ -66,8 +66,10 @@ def look_towards(des_pos):
     beacon_yaw = math.atan2(beacon_pose.position.y - des_pos.position.y, beacon_pose.position.x - des_pos.position.x)
     yaw_diff = normalize(beacon_yaw - yaw)
 
+    # math.fabs = returns absolute value of a number as a float
     if math.fabs(yaw_diff) > yaw_threshold:
-        twist.angular.z = -0.5  # clockwise rotation if yaw_diff > 0 else 0.5  # counter-clockwise rotation
+        print("math fabs", math.fabs(yaw_diff))
+        twist.angular.z = -0.2  # clockwise rotation if yaw_diff > 0 else 0.5  # counter-clockwise rotation
 
     if math.fabs(yaw_diff) <= yaw_threshold:
         twist.angular.z = 0
@@ -76,14 +78,14 @@ def look_towards(des_pos):
 
 
 def goal_seek():
-    global zone_F, currentBotState, bot_pose, wall_hit_point, front_obs_distance, left_obs_distance
+    global zone_F, zone_FL, zone_FR, currentBotState, bot_pose, wall_hit_point, front_obs_distance, left_obs_distance
     # zone_F = numpy.array(zone_F)
-    obstacle_in_front = numpy.any((zone_F < 0.85))
-    # obstacle_in_frontLeft = numpy.any((zone_FL <= 0.5))
-    # obstacle_in_frontRight = numpy.any((zone_FR <= 0.5))
+    obstacle_in_front = numpy.any((zone_F < 1))
+    obstacle_in_frontLeft = numpy.any((zone_FL < 0.5))
+    obstacle_in_frontRight = numpy.any((zone_FR < 0.5))
     # Or find the minimum value in this zone. or maybe numpy.any would be faster
-    # print(obstacle_in_front, zone_F)
-    if obstacle_in_front:
+    print(obstacle_in_front, zone_F)
+    if obstacle_in_front or obstacle_in_frontLeft or obstacle_in_frontRight:
         twist.linear.x = 0
         wall_hit_point = bot_pose.position
         currentBotState = BotState.WALL_FOLLOW
@@ -94,14 +96,16 @@ def goal_seek():
 
 
 def wall_follow():
+    print("wall follow initilised")
     global twist, bot_pose, bot_motion, currentBotState, distance_moved, wall_hit_point
+    
 
     # Todo: Tune the parameters.
     # maybe turn right until zone_F is clear
     # Wall follow enter
     obstacle_in_front = numpy.any((zone_F < front_obs_distance))
     distance_moved = math.sqrt(pow(bot_pose.position.y - wall_hit_point.y, 2) + pow(bot_pose.position.x - wall_hit_point.x, 2))
-    # print(line_distance(), distance_moved, (line_distance() < 0.2 and distance_moved > 0.5))
+    print(line_distance(), distance_moved, (line_distance() < 0.2 and distance_moved > 0.5))
 
     if line_distance() < 0.2 and distance_moved > 0.5:
         print("line_hit")
@@ -112,18 +116,23 @@ def wall_follow():
         currentBotState = BotState.LOOK_TOWARDS
         return
     elif obstacle_in_front:  # turn right
+        print("turn right")
         twist.angular.z = -0.5
         twist.linear.x = 0
-    elif numpy.all((zone_FL >= left_obs_distance)):  # or numpy.any((zone_FR <= 1)):  # turn left
+    elif obstacle_in_front:  # turn right
+        print("turn left")
         twist.angular.z = 0.5
         twist.linear.x = 0
     else:
+        print("move forward")
         twist.angular.z = 0  # move forward
         twist.linear.x = 0.5
 
     bot_motion.publish(twist)
+    
 
 
+# distance between a point and a line - right angles to the line
 def line_distance():
     global init_bot_pose, beacon_pose, bot_pose
     point_1 = init_bot_pose  # in form of array
@@ -173,11 +182,20 @@ def process_sensor_info(data):
 
     # Note: Configuration 2 - Breaking at uneven angles
     zone = numpy.array(data.ranges)
-    zone_R = zone[0:50]  # 30deg
-    zone_FR = zone[51:140]
-    zone_F = zone[141:220]
-    zone_FL = zone[221:310]
-    zone_L = zone[311:361]
+    #zone_R = zone[0:50]  # 30deg
+    #zone_FR = zone[51:140]
+    #zone_F = zone[141:220]
+    #zone_FL = zone[221:310]
+    #zone_L = zone[311:361]
+
+    # Laser scanner is set for 180 degrees field of view -90 to 90
+    zone_R = zone[0:35]  # 36 deg
+    zone_FR = zone[36:71]
+    zone_F = zone[71:107]
+    zone_FL = zone[108:143]
+    zone_L = zone[144:179]
+
+
     if front_obs_distance is None and left_obs_distance is None:
         front_obs_distance = 1
         left_obs_distance = 1
@@ -199,13 +217,13 @@ def bot_bug2():
         if not init_config_complete:
             return
         if currentBotState is BotState.LOOK_TOWARDS:
-            # print("look towards")
+            print("look towards")
             look_towards(bot_pose)
         elif currentBotState is BotState.GOAL_SEEK:
-            # print("Goal Seek")
+            print("Goal Seek")
             goal_seek()
         elif currentBotState is BotState.WALL_FOLLOW:
-            # print("Wall Follow")
+            print("Wall Follow")
             wall_follow()
             # return
 
@@ -215,16 +233,17 @@ def bot_bug2():
 
 def init():
     global homing_signal
-    rospy.init_node("bug2", anonymous=True)
+    rospy.init_node("bug2")
     homing_signal = rospy.Subscriber('/homing_signal', PoseStamped, callback)
-    rospy.Subscriber('/base_scan', LaserScan, process_sensor_info)
-    rospy.Subscriber('/base_pose_ground_truth', Odometry, get_base_truth)
-
+    rospy.Subscriber('/thorvald_001/front_scan', LaserScan, process_sensor_info)
+    rospy.Subscriber('/thorvald_001/odometry/base_raw', Odometry, get_base_truth)
+    print('--------- bug2 has started -----------')
     rospy.spin()
 
 
 if __name__ == '__main__':
     try:
         init()
+        
     except rospy.ROSInterruptException:
         pass

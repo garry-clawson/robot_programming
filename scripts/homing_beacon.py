@@ -10,11 +10,13 @@ def talker():
     rospy.init_node('homing_beacon', anonymous=False)
     rate = rospy.Rate(10) # 10hz
 
-    home_pose = PoseStamped()
-    home_pose.header.frame_id = "odom"
+    print("-------- Homing beacon initialised ----------")
 
-    home_pose.pose.position.x = 4.2
-    home_pose.pose.position.y = 8.8
+    home_pose = PoseStamped()
+    home_pose.header.frame_id = "thorvald_001/odom"
+
+    home_pose.pose.position.x = 0
+    home_pose.pose.position.y = -10
     home_pose.pose.position.z = 0
 
     
