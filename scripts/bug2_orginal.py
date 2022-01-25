@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
-# Inspired by --> https://github.com/bipul93/ros-bug2/blob/master/scripts/bot.py
+# Credit --> https://github.com/bipul93/ros-bug2/blob/master/scripts/bot.py
 
 import rospy
 from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
-from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
 # self created programs used
 #from rotate import *
 
 from nav_msgs.msg import Odometry
+from tf.transformations import euler_from_quaternion
+
 import enum
 import math
 import numpy
@@ -23,16 +24,17 @@ class BotState(enum.Enum):
     LOOK_TOWARDS = 0  # rotate bots towards the goal
     GOAL_SEEK = 1  # follow line
     WALL_FOLLOW = 2  # Go around the wall / avoid obstacles
-    ROTATE_TO_VINES = 3 # Rotate towards vines
 
-# Initialised values
+
 yaw = 0
 yaw_threshold = math.pi / 45
 goal_distance_threshold = 0.5
 currentBotState = BotState.LOOK_TOWARDS
+
 # base scan laser range values
 maxRange = 3
 minRange = 0
+
 bot_pose = None
 init_bot_pose = []
 beacon_pose = None
@@ -41,20 +43,15 @@ homing_signal = None  # subscriber
 init_config_complete = False
 wall_hit_point = None
 beacon_found = False
-facing_vines = False
 twist = Twist()
 distance_moved = 0
+
 front_obs_distance = None
 left_obs_distance = None
+
 wall_following = False
-#Target for rotation and smoothing speed (kp) used to slow down the rotation the closer we get to our target
-target = -90 # Target angle to achive ibn degrees (Note: this is the world view and is directly facuing the grape vines)
-kp=0.5 # Slows the angle of rotation the closer you get to the desried angle (stops from overshooting)
 
 
-
-
-# Angles are from 180 to -180 so nneed to nrolaise tio this rather than 320 etc
 def normalize(angle):
     if math.fabs(angle) > math.pi:
         angle = angle - (2 * math.pi * angle) / (math.fabs(angle))
@@ -75,7 +72,7 @@ def look_towards(des_pos):
 
     # math.fabs = returns absolute value of a number as a float
     if math.fabs(yaw_diff) > yaw_threshold:
-        print("Rads to get to beacon", math.fabs(yaw_diff))
+        print("math fabs", math.fabs(yaw_diff))
         twist.angular.z = -0.2  # clockwise rotation if yaw_diff > 0 else 0.5  # counter-clockwise rotation
 
     if math.fabs(yaw_diff) <= yaw_threshold:
@@ -83,7 +80,7 @@ def look_towards(des_pos):
         currentBotState = BotState.GOAL_SEEK
     bot_motion.publish(twist)
 
-# Seeks out the homing beacon and if comes into contact with an obstrucrtion envokes the wall_follow() function (algroythm used is BUG2)
+
 def goal_seek():
     global zone_F, zone_FL, zone_FR, currentBotState, bot_pose, wall_hit_point, front_obs_distance, left_obs_distance
     # zone_F = numpy.array(zone_F)
@@ -100,14 +97,11 @@ def goal_seek():
     bot_motion.publish(twist)
 
 
-# Follows any obstricle in the fashion of BUG2 using the becaon as the target to get too
-# Depending on the rottaion of the vines this maybe useful to spawn the robot perpendicular to the vines and have the target
-# point behind them. This way the robot will navigate fully around each vine row 
-# After though - BUG1 would have been better here as it would fully encompas each vine hedge befor going to its nearest jump off point
-# as it moves ot its target (beacon) point - should have thought about that!! 
 def wall_follow():
     print("wall follow initilised")
     global twist, bot_pose, bot_motion, currentBotState, distance_moved, wall_hit_point
+    
+
     # Todo: Tune the parameters.
     # maybe turn right until zone_F is clear
     # Wall follow enter
@@ -127,46 +121,19 @@ def wall_follow():
         return
     elif obstacle_in_front:  # turn right
         print("turn right")
-        twist.angular.z = -0.5
-        twist.linear.x = 0
+        move.Mover()
+        #twist.angular.z = -0.5
+        #twist.linear.x = 0
     else:
         print("move forward")
         twist.angular.z = 0  # move forward
         twist.linear.x = 0.5
+
     bot_motion.publish(twist)
     
-# Rotates to face the vines according tpo the world view (-90 degrees). This uses the front IKinect HD camera but couuld have also used left or right 
-# hand camera here
-def rotate_to_vines():
-    print("rotating to vines")
-    global bot_motion, twist, bot_pose, target, currentBotState, yaw_threshold
-    #bot_motion = rospy.Publisher("/thorvald_001/teleop_joy/cmd_vel", Twist, queue_size=10)
-    target_rad = target*math.pi/180 #-90 degrees to face towards vines
-    print("bot pose", bot_pose)
-    # Change bot pose from Quarternion to euler to get the yaw and difference to target (-90 degrees)
-    quaternion = (
-        bot_pose.orientation.x,
-        bot_pose.orientation.y,
-        bot_pose.orientation.z,
-        bot_pose.orientation.w)
-    euler = euler_from_quaternion(quaternion)
-    yaw_ = euler[2]  # bot's yaw
-    print("yaw", yaw_)
-
-    if math.fabs(target_rad-yaw_) > yaw_threshold:
-        print("bot pose", bot_pose)
-        print("target_rad", target_rad)
-        twist.linear.x = 0.0
-        twist.angular.z = kp * (target_rad-yaw_)
-    else:
-        twist.angular.z = 0
-        facing_vines = True
-    bot_motion.publish(twist)
-        
 
 
 # distance between a point and a line - right angles to the line
-# When following the line we need ot know the shortest distance to jump ioff from (BUG2 algorythem -> https://automaticaddison.com/the-bug2-algorithm-for-robot-motion-planning/ )
 def line_distance():
     global init_bot_pose, beacon_pose, bot_pose
     point_1 = init_bot_pose  # in form of array
@@ -184,9 +151,9 @@ def callback(msg):
     # goal_location.unregister()
     rospy.wait_for_message("homing_signal", PoseStamped)
 
-# Bot pose position relative to homing beacon
+
 def get_base_truth(bot_data):
-    global bot_pose, beacon_found, goal_distance_threshold, currentBotState
+    global bot_pose, beacon_found, goal_distance_threshold
     bot_pose = bot_data.pose.pose
     if not init_config_complete:
         check_init_config()
@@ -195,22 +162,41 @@ def get_base_truth(bot_data):
         goal_distance = math.sqrt(pow(bot_pose.position.y - beacon_pose.position.y, 2) + pow(bot_pose.position.x - beacon_pose.position.x, 2))
         # print(goal_distance)
         if goal_distance <= goal_distance_threshold:
-            currentBotState = BotState.ROTATE_TO_VINES
             beacon_found = True
-            
+
 
 def process_sensor_info(data):
     global maxRange, minRange, front_obs_distance, left_obs_distance, zone_R, zone_FR, zone_F, zone_FL, zone_L
     maxRange = data.range_max
     minRange = data.range_min
 
-    # Note: Configuration  - Breaking at uneven angles
+    # Note: Configuration one
+    # zone = numpy.array_split(numpy.array(data.ranges), 5)
+    # zone_R = zone[0]
+    # zone_FR = zone[1]
+    # zone_F = zone[2]
+    # zone_FL = zone[3]
+    # zone_L = zone[4]
+    # if front_obs_distance is None and left_obs_distance is None:
+    #     front_obs_distance = 0.75
+    #     left_obs_distance = 2
+
+    # Note: Configuration 2 - Breaking at uneven angles
     zone = numpy.array(data.ranges)
-    zone_R = zone[0:143]  
+    #zone_R = zone[0:50]  # 30deg
+    #zone_FR = zone[51:140]
+    #zone_F = zone[141:220]
+    #zone_FL = zone[221:310]
+    #zone_L = zone[311:361]
+
+    # Laser scanner is set for 180 degrees field of view -90 to 90
+    zone_R = zone[0:143]  # 36 deg
     zone_FR = zone[144:287]
     zone_F = zone[288:431]
     zone_FL = zone[432:575]
     zone_L = zone[576:719]
+
+
 
     if front_obs_distance is None and left_obs_distance is None:
         front_obs_distance = 1
@@ -229,7 +215,7 @@ def bot_bug2():
     global bot_motion, currentBotState, bot_pose
     bot_motion = rospy.Publisher("/thorvald_001/teleop_joy/cmd_vel", Twist, queue_size=10)
     rate = rospy.Rate(10)
-    while not facing_vines:
+    while not beacon_found:
         if not init_config_complete:
             return
         if currentBotState is BotState.LOOK_TOWARDS:
@@ -241,15 +227,13 @@ def bot_bug2():
         elif currentBotState is BotState.WALL_FOLLOW:
             print("Wall Follow")
             wall_follow()
-        elif currentBotState is BotState.ROTATE_TO_VINES:
-            print("Rotate to Vines")
-            rotate_to_vines()
             # return
+
         rate.sleep()
-    print("Facing vines")
-
-
-
+    print("Beacon Found")
+    pub = rospy.Publisher('beacon_found', String, queue_size=10) #publish that the becon has been found
+    hello_str = "yes"
+    pub.publish(hello_str)
 
 
 
