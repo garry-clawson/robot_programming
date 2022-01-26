@@ -130,9 +130,9 @@ class image_listener:
 
         # create the small border around the image. As the robot will move forwards down the row then don't catch the right border
         # because the the nexct image the left border will catch any overlap and register it (hopefully!!)
-        # If the robot is tooclose this will work and if far enough away the border wont be required top/bottom
+        # If the robot is too close this will work and if far enough away the border wont be required top/bottom
         # Inspired by -> https://stackoverflow.com/questions/53064534/simple-blob-detector-does-not-detect-blobs
-        grape_bunch_mask=cv2.copyMakeBorder(grape_bunch_mask, top=1, bottom=1, left=1, right=1, borderType= cv2.BORDER_CONSTANT, value=[255,255,255] ) 
+        grape_bunch_mask=cv2.copyMakeBorder(grape_bunch_mask, top=1, bottom=1, left=1, right=0, borderType= cv2.BORDER_CONSTANT, value=[255,255,255] ) 
 
         # FROM -> https://www.learnopencv.com/blob-detection-using-opencv-python-c/
         # Inspired params from -> https://stackoverflow.com/questions/53064534/simple-blob-detector-does-not-detect-blobs 

@@ -15,10 +15,12 @@ def talker():
     home_pose = PoseStamped()
     home_pose.header.frame_id = "thorvald_001/odom"
 
+    # Comment:
     # These are set manually but can be ste by passing params in the launch file
     # Great resource for ref -> https://campus-rover.gitbook.io/lab-notebook/faq/using-args-params-roslaunch 
-    home_pose.pose.position.x = 0
-    home_pose.pose.position.y = 0
+    # The x is  up and down and the y is the left right in this world view
+    home_pose.pose.position.x = -6
+    home_pose.pose.position.y = -4
     home_pose.pose.position.z = 0
 
     # Continue top publish homing beacon until shutdown

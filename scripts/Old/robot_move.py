@@ -33,7 +33,7 @@ class Mover:
         # Logs the details and prints to console
         rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.header.seq)
 
-        # Note: The raneg split is currently at uneven angles. We could use >> 'zone = numpy.array_split(numpy.array(data.ranges), 5)' and split into 5 equal zones?
+        # Note: The range split is currently at uneven angles. We could use >> 'zone = numpy.array_split(numpy.array(data.ranges), 5)' and split into 5 equal zones?
         # However, there are 720 data.ranges. This is defined in the sensors URDF folder for the Hokuya camera (bacchus_sensors.xacro file - line 29,30), which
         # holds the args that are pulled through via the launch file. These can be changed to: min_angle="-0.7854" and max_angle="2.3562" respectivly
         # The front camera on the Thorvald is offset by 45 degrees so doesn't detect within a range - I think this is because if you set the range from

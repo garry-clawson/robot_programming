@@ -46,18 +46,12 @@ front_obs_distance = None
 left_obs_distance = None
 wall_following = False
 #Target for rotation and smoothing speed (kp) used to slow down the rotation the closer we get to our target
-target = -90 # Target angle to achive ibn degrees (Note: this is the world view and is directly facuing the grape vines)
+target = 180 # Target angle to achive ibn degrees (Note: this is the world view and is directly facuing the grape vines)
 kp=0.5 # Slows the angle of rotation the closer you get to the desried angle (stops from overshooting)
 
 
-# --------------------------------------------- called and helper functions --------------------------------------
+# --------------------------------------------- movement functions --------------------------------------
 
-
-# Angles are from 180 to -180 so nneed to nrolaise tio this rather than 320 etc
-def normalize(angle):
-    if math.fabs(angle) > math.pi:
-        angle = angle - (2 * math.pi * angle) / (math.fabs(angle))
-    return angle
 
 # Looks towards the homing beacon position
 def look_towards(des_pos):
@@ -75,7 +69,7 @@ def look_towards(des_pos):
     # math.fabs = returns absolute value of a number as a float
     if math.fabs(yaw_diff) > yaw_threshold:
         print("Rads to get to beacon", math.fabs(yaw_diff))
-        twist.angular.z = -0.2  # clockwise rotation if yaw_diff > 0 else 0.5  # counter-clockwise rotation
+        twist.angular.z = -0.2 # clockwise rotation if yaw_diff > 0 else 0.5  # counter-clockwise rotation
 
     if math.fabs(yaw_diff) <= yaw_threshold:
         twist.angular.z = 0
@@ -84,56 +78,115 @@ def look_towards(des_pos):
 
 # Seeks out the homing beacon and if comes into contact with an obstrucrtion envokes the wall_follow() function (algroythm used is BUG2)
 def goal_seek():
+    print("goal seek initilised")
     global zone_F, zone_FL, zone_FR, currentBotState, bot_pose, wall_hit_point, front_obs_distance, left_obs_distance
-    # zone_F = numpy.array(zone_F)
-    obstacle_in_front = numpy.any((zone_F < 2))
+
+    # Comment:
+    # UIse 1.5 distance here as this allows us to move around the wall with a 2m offset but then gives us change to get closer
+    # once we are in a line distance position. 1m is the lowest  and with trials the robtos corners caught on the hedge
+    # when the becaon is positiohned very close to it (just to see hwo close we can get and also trying to tune the parameters)
+    obstacle_in_front = numpy.any((zone_F < 1.5)) or numpy.any((zone_FR < 1.5)) or numpy.any((zone_FL < 1.5)) #Note that 1.5 is 
     # Or find the minimum value in this zone. or maybe numpy.any would be faster
-    print(obstacle_in_front, zone_F)
+    print("obsticle in front?", obstacle_in_front)
     if obstacle_in_front:
         twist.linear.x = 0
         wall_hit_point = bot_pose.position
         currentBotState = BotState.WALL_FOLLOW
     else:
         twist.angular.z = 0
-        twist.linear.x = 0.5
+        twist.linear.x = 1
     bot_motion.publish(twist)
 
-
-# Follows any obstricle in the fashion of BUG2 using the becaon as the target to get too
+# Comment:
+# Avoids obsticales and follows walls to the BUG2 algorythm using the beacon as the target to get too
 # Depending on the rottaion of the vines this maybe useful to spawn the robot perpendicular to the vines and have the target
 # point behind them. This way the robot will navigate fully around each vine row 
 # After though - BUG1 would have been better here as it would fully encompas each vine hedge befor going to its nearest jump off point
 # as it moves ot its target (beacon) point - should have thought about that!! 
+
 def wall_follow():
     print("wall follow initilised")
     global twist, bot_pose, bot_motion, currentBotState, distance_moved, wall_hit_point
-    # Todo: Tune the parameters.
-    # maybe turn right until zone_F is clear
-    # Wall follow enter
-    obstacle_in_front = numpy.any((zone_F < front_obs_distance))
-    #obstacle_in_frontLeft = numpy.any((zone_FL < 2))
-    #obstacle_in_frontRight = numpy.any((zone_FR < 2))
+
+    # Comment: 
+    # The distance '<2' should be at least as large as if the robot was inscribed in a circle
+    # In Thorvalds instance its rectnagluar in shape so the enscribed circle when rotating about its centre point + some tolerance
+    obstacle_in_front = numpy.any((zone_F < 2)) or numpy.any((zone_FR < 2)) or numpy.any((zone_FL < 2))
     distance_moved = math.sqrt(pow(bot_pose.position.y - wall_hit_point.y, 2) + pow(bot_pose.position.x - wall_hit_point.x, 2))
-    print(line_distance(), distance_moved, (line_distance() < 0.2 and distance_moved > 0.5))
+    #print(line_distance(), distance_moved, (line_distance() < 0.2 and distance_moved > 0.5))
+
 
     if line_distance() < 0.2 and distance_moved > 0.5:
         print("line_hit")
         print(distance_moved)
-        # found line point. rotate and move forward
+        # found line point. rotate and move forward via the LOOK_TOWARDS state
         twist.angular.z = 0
         twist.linear.x = 0
         currentBotState = BotState.LOOK_TOWARDS
         return
-    elif obstacle_in_front:  # turn right
+    elif numpy.any((zone_F < 2)) or numpy.any((zone_FR < 2)):  # turn left
         print("turn right")
-        twist.angular.z = -0.5
+        twist.angular.z = 1
+        twist.linear.x = 0
+    elif numpy.any((zone_F < 2)) or numpy.any((zone_FL < 2)):  # turn right
+        print("turn right")
+        twist.angular.z = -1
         twist.linear.x = 0
     else:
         print("move forward")
         twist.angular.z = 0  # move forward
         twist.linear.x = 0.5
     bot_motion.publish(twist)
+
+
+# The below is more saphsiticated but runs into logical erros when changing between states (can get caught in a loop of > move > wall > goal > move ...)
+"""     if line_distance() < 0.2 and distance_moved > 0.5:
+        print("line_hit")
+        print(distance_moved)
+        # found line point. rotate and move forward via the LOOK_TOWARDS state
+        twist.angular.z = 0
+        twist.linear.x = 0
+        currentBotState = BotState.LOOK_TOWARDS
+        return
+    elif numpy.any((zone_F < 2)) and numpy.any((zone_FL > 2)) and numpy.any((zone_FR > 2)):
+        print("turn right")
+        twist.angular.z = -1
+        twist.linear.x = 0
+    elif numpy.any((zone_F > 2)) and numpy.any((zone_FL > 2)) and numpy.any((zone_FR < 2)):
+        print("turn right")
+        twist.angular.z = -1
+        twist.linear.x = 0
+    elif numpy.any((zone_F > 2)) and numpy.any((zone_FL < 2)) and numpy.any((zone_FR > 2)):
+        print("turn left")
+        twist.angular.z = 1
+        twist.linear.x = 0
+    elif numpy.any((zone_F < 2)) and numpy.any((zone_FL > 2)) and numpy.any((zone_FR < 2)):
+        print("turn right")
+        twist.angular.z = -1
+        twist.linear.x = 0
+    elif numpy.any((zone_F < 2)) and numpy.any((zone_FL < 2)) and numpy.any((zone_FR > 2)):
+        print("turn left")
+        twist.angular.z = 1
+        twist.linear.x = 0
+    elif numpy.any((zone_F < 2)) and numpy.any((zone_FL < 2)) and numpy.any((zone_FR < 2)):
+        print("turn right")
+        twist.angular.z = -1
+        twist.linear.x = 0
+    elif numpy.any((zone_F > 2)) and numpy.any((zone_FL < 2)) and numpy.any((zone_FR < 2)):
+        print("turn right")
+        twist.angular.z = -1
+        twist.linear.x = 0
+
+    bot_motion.publish(twist)   
+ """
+
+
+
+
+
+
     
+
 # Rotates to face the vines according tpo the world view (-90 degrees). This uses the front IKinect HD camera but couuld have also used left or right 
 # hand camera here
 def rotate_to_vines():
@@ -163,6 +216,14 @@ def rotate_to_vines():
     bot_motion.publish(twist)
         
 
+# --------------------------------------------- helper functions --------------------------------------
+
+
+# Angles are from 180 to -180 so nneed to nrolaise tio this rather than 320 etc
+def normalize(angle):
+    if math.fabs(angle) > math.pi:
+        angle = angle - (2 * math.pi * angle) / (math.fabs(angle))
+    return angle
 
 # distance between a point and a line - right angles to the line
 # When following the line we need ot know the shortest distance to jump ioff from (BUG2 algorythem -> https://automaticaddison.com/the-bug2-algorithm-for-robot-motion-planning/ )
@@ -197,27 +258,40 @@ def get_base_truth(bot_data):
             currentBotState = BotState.ROTATE_TO_VINES
             beacon_found = True
             
-
+# Takes subscriber infor from front scan and assigns field of view zones
 def process_sensor_info(data):
     global maxRange, minRange, front_obs_distance, left_obs_distance, zone_R, zone_FR, zone_F, zone_FL, zone_L
-    maxRange = data.range_max
-    print("maxRange", maxRange)
-    minRange = data.range_min
-    print("minRange", minRange)
+    
+    # Testing print outs
+    #maxRange = data.range_max
+    #print("maxRange", maxRange)
+    #minRange = data.range_min
+    #print("minRange", minRange)
 
-    # Note: Configuration  - Breaking at uneven angles
-    # we cuold use >> zone = numpy.array_split(numpy.array(data.ranges), 5) and split into 5 equal zones
-    zone = numpy.array(data.ranges)
-    zone_R = zone[0:50]  # 30deg
-    zone_FR = zone[51:140]
-    zone_F = zone[141:220]
-    zone_FL = zone[221:310]
-    zone_L = zone[311:361]
+
+    # Comment:
+    # The range split is currently at uneven angles. We could use >> 'zone = numpy.array_split(numpy.array(data.ranges), 5)' and split into 5 equal zones?
+    # However, there are 720 data.ranges. This is defined in the sensors URDF folder for the Hokuya camera (bacchus_sensors.xacro file - line 29,30), which
+    # holds the args that are pulled through via the launch file. These can be changed to: min_angle="-0.7854" and max_angle="2.3562" respectivly
+    # The front camera on the Thorvald is offset by 45 degrees so doesn't detect within a range - I think this is because if you set the range from
+    # -180 to 180, you have a gap at between the front and back camera (must be because the cameras are mounted back to back and obviously not ontop of one another
+    # For me to use data ranges I will need to amend the front sensor URDF folder to adjust for the 45 degree offset so the front zones are actually the front laser scans
+    # A benefit to splitting the laserscan into zones is you can get a narrow field of view if going down tight tunnels with larger forward zone and smaller side zones
+    # However, a downside I have seen through testing is that the robot can get caught looping around the same 'avoid' route - never crashing but never taking a risk either! Come on Thorvald!!
+
+    zone = numpy.array(data.ranges) 
+    zone_R = zone[0:143] 
+    zone_FR = zone[144:287]
+    zone_F = zone[288:431]
+    zone_FL = zone[432:575]
+    zone_L = zone[576:719]
 
     if front_obs_distance is None and left_obs_distance is None:
         front_obs_distance = 2
         left_obs_distance = 2
 
+
+# --------------------------------------------- main while loop for robot --------------------------------------
 
 def check_init_config():
     global bot_pose, beacon_pose, init_config_complete, init_bot_pose
