@@ -1,11 +1,13 @@
 #!/usr/bin/env python
+
+# Inspired by the great LCAS repo -> https://github.com/LCAS/CMP9767M/tree/master/uol_cmp9767m_tutorial/scripts 
+
 import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
-from geometry_msgs.msg import PoseStamped
-from math import cos, sin
-from tf import TransformListener
+import numpy
+import random #used for giving different angluar speeds to make the robot explore all areas when avoiding collisions
 
 class Mover:
     """
@@ -21,116 +23,50 @@ class Mover:
         to listen to lasr scans and a Publisher to control
         the robot
         """
-        self.publisher = rospy.Publisher(
-            '/thorvald_001/teleop_joy/cmd_vel',
-            Twist, queue_size=1)
+        self.publisher = rospy.Publisher('/thorvald_001/teleop_joy/cmd_vel', Twist, queue_size=1)
         rospy.Subscriber("/thorvald_001/front_scan", LaserScan, self.callback)
-        self.pose_pub = rospy.Publisher(
-            '/nearest_obstacle',
-            PoseStamped,queue_size=1
-        )
-        self.listener = TransformListener()
-
 
     def callback(self, data):
         """
         Callback called any time a new laser scan becomes available
         """
+        # Logs the details and prints to console
+        rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.header.seq)
 
-        # some logging on debug level, not usually displayed
-        rospy.logdebug("I heard %s", data.header.seq)
+        # Note: The raneg split is currently at uneven angles. We could use >> 'zone = numpy.array_split(numpy.array(data.ranges), 5)' and split into 5 equal zones?
+        # However, there are 720 data.ranges. This is defined in the sensors URDF folder for the Hokuya camera (bacchus_sensors.xacro file - line 29,30), which
+        # holds the args that are pulled through via the launch file. These can be changed to: min_angle="-0.7854" and max_angle="2.3562" respectivly
+        # The front camera on the Thorvald is offset by 45 degrees so doesn't detect within a range - I think this is because if you set the range from
+        # -180 to 180, you have a gap at between the front and back camera (must be because the cameras are mounted back to back and obviously not ontop of one another
+        # For me to use data ranges I will need to amend the front sensor URDF folder to adjust for the 45 degree offset so the front zones are actually the front laser scans
+        # A benefit to splitting the laserscan into zones is you can get a narrow field of view if going down tight tunnels with larger forward zone and smaller side zones
+        # However, a downside I have seen through testing is that the robot can get caught looping around the same 'avoid' route - never crashing but never taking a risk either! Come on Thorvald!!
 
-        # This find the closest of all laser readings
-        min_dist = min(data.ranges)
+        zone = numpy.array(data.ranges) 
+        zone_R = zone[0:143] 
+        zone_FR = zone[144:287]
+        zone_F = zone[288:431]
+        zone_FL = zone[432:575]
+        zone_L = zone[576:719]
 
-        # let's already create an object of type Twist to
-        # publish it later. All initialised to 0!
+
         t = Twist()
-
-        # If anything is closer than 2 metres anywhere in the
-        # scan, we turn away
-        if min_dist < 2:
-            t.angular.z = 1.0
-        else:  # if all obstacles are far away, let's keep 
-            # moving forward at 0.8 m/s
+        if numpy.any((zone_F < 2)) or numpy.any((zone_FR < 2)) or numpy.any((zone_FL < 2)):
+            t.angular.z = 1 
+        else:
             t.linear.x = 0.8
-        # publish to the topic that makes the robot actually move
         self.publisher.publish(t)
 
-        # above in min_dist we found the nearest value,
-        # but to display the position of the nearest value
-        # we need to find which range index corresponds to that
-        # min_value.  
-        # find the index of the nearest point 
-        # (trick from https://stackoverflow.com/a/11825864)
-        # it really is a very Python-ic trick here using a getter 
-        # function on the range. Can also be done with a 
-        # classic for loop
-        index_min = min(
-            range(len(data.ranges)),
-            key=data.ranges.__getitem__)
-        
-        # convert the obtained index to angle, using the 
-        # reported angle_increment, and adding that to the 
-        # angle_min, i.e. the angle the index 0 corresponds to.
-        # (is negative, in fact -PI/2).
-        alpha = data.angle_min + (index_min * data.angle_increment)
 
-        # No time for some trigonometry to turn the 
-        # polar coordinates into cartesian coordinates
-        # inspired by https://stackoverflow.com/a/20926435
-        # use trigonometry to create the point in laser 
-        # z = 0, in the frame of the laser 
-        laser_point_2d = [ 
-            cos(alpha) * min_dist, 
-            sin(alpha) * min_dist,
-            0.0]
 
-        # create an empty PoseStamped to be published later.
-        pose = PoseStamped()
-
-        # keep the frame ID (the entire header here) as read from 
-        # the sensor. This is general ROS practice, as it 
-        # propagates the recording time from the sensor and 
-        # the corrdinate frame of the sensor through to
-        # other results we may be publishing based on the anaylysis
-        # of the data of that sensor
-
-        pose.header = data.header
-
-        # fill in the slots from the points calculated above.
-        # bit tedious to do it this way, but hey... 
-        pose.pose.position.x = laser_point_2d[0]
-        pose.pose.position.y = laser_point_2d[1]
-        pose.pose.position.z = laser_point_2d[2]
-
-        # using my trick from https://github.com/marc-hanheide/jupyter-notebooks/blob/master/quaternion.ipynb
-        # to convert to quaternion, so that the Pose always 
-        # points in the direction of the laser beam. 
-        # Not required if only the positions is
-        # of relevance 
-        # (then just set pose.pose.orientation.w = 1.0 and leave
-        # others as 0).
-        pose.pose.orientation.x = 0.0
-        pose.pose.orientation.y = 0.0
-        pose.pose.orientation.z = sin(alpha/2)
-        pose.pose.orientation.w = cos(alpha/2)
-
-        # publish the pose so it can be visualised in rviz
-        self.pose_pub.publish(pose)
-
-        rospy.loginfo(
-            "The closest point in laser frame coords is at\n%s"
-            % pose.pose.position
-            )
-
-        # now lets actually transform this pose into a robot 
-        # "base_link" frame.
-        transformed_pose = self.listener.transformPose("thorvald_001/base_link", pose)
-        rospy.loginfo(
-            "The closest point in robot coords is at\n%s"
-            % transformed_pose.pose.position
-            )
+        #Takes min distance from laserscan and if less than 4m issues twist message to rotate
+        #min_dist = min(data.ranges)
+        #t = Twist()
+        #if min_dist < 4:
+        #    t.angular.z = 1.0
+        #else:
+        #    t.linear.x = 0.8
+        #self.publisher.publish(t)
 
 
 

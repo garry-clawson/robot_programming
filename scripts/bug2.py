@@ -8,26 +8,24 @@ from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
-
-# self created programs used
-#from rotate import *
-
 from nav_msgs.msg import Odometry
 import enum
 import math
 import numpy
 
+# --------------------------------------------- define variables --------------------------------------
 
 # Defining Bot States
+# We move between these states before we get to our desrired location depending on vineyard and obsticles
 class BotState(enum.Enum):
     LOOK_TOWARDS = 0  # rotate bots towards the goal
     GOAL_SEEK = 1  # follow line
     WALL_FOLLOW = 2  # Go around the wall / avoid obstacles
-    ROTATE_TO_VINES = 3 # Rotate towards vines
+    ROTATE_TO_VINES = 3 # Rotate towards vines to take camera image
 
 # Initialised values
 yaw = 0
-yaw_threshold = math.pi / 45
+yaw_threshold = math.pi / 90 #Set at 90 as this gives 2 degrees tolerence I found due to size of vineyard and testing at far edges 4 degs missed homing spots (could moke homing spot larger (line distance value)? - pros and cons)
 goal_distance_threshold = 0.5
 currentBotState = BotState.LOOK_TOWARDS
 # base scan laser range values
@@ -52,6 +50,7 @@ target = -90 # Target angle to achive ibn degrees (Note: this is the world view 
 kp=0.5 # Slows the angle of rotation the closer you get to the desried angle (stops from overshooting)
 
 
+# --------------------------------------------- called and helper functions --------------------------------------
 
 
 # Angles are from 180 to -180 so nneed to nrolaise tio this rather than 320 etc
@@ -87,7 +86,7 @@ def look_towards(des_pos):
 def goal_seek():
     global zone_F, zone_FL, zone_FR, currentBotState, bot_pose, wall_hit_point, front_obs_distance, left_obs_distance
     # zone_F = numpy.array(zone_F)
-    obstacle_in_front = numpy.any((zone_F < 1))
+    obstacle_in_front = numpy.any((zone_F < 2))
     # Or find the minimum value in this zone. or maybe numpy.any would be faster
     print(obstacle_in_front, zone_F)
     if obstacle_in_front:
@@ -112,8 +111,8 @@ def wall_follow():
     # maybe turn right until zone_F is clear
     # Wall follow enter
     obstacle_in_front = numpy.any((zone_F < front_obs_distance))
-    obstacle_in_frontLeft = numpy.any((zone_FL < 0.5))
-    obstacle_in_frontRight = numpy.any((zone_FR < 0.5))
+    #obstacle_in_frontLeft = numpy.any((zone_FL < 2))
+    #obstacle_in_frontRight = numpy.any((zone_FR < 2))
     distance_moved = math.sqrt(pow(bot_pose.position.y - wall_hit_point.y, 2) + pow(bot_pose.position.x - wall_hit_point.x, 2))
     print(line_distance(), distance_moved, (line_distance() < 0.2 and distance_moved > 0.5))
 
@@ -202,19 +201,22 @@ def get_base_truth(bot_data):
 def process_sensor_info(data):
     global maxRange, minRange, front_obs_distance, left_obs_distance, zone_R, zone_FR, zone_F, zone_FL, zone_L
     maxRange = data.range_max
+    print("maxRange", maxRange)
     minRange = data.range_min
+    print("minRange", minRange)
 
     # Note: Configuration  - Breaking at uneven angles
+    # we cuold use >> zone = numpy.array_split(numpy.array(data.ranges), 5) and split into 5 equal zones
     zone = numpy.array(data.ranges)
-    zone_R = zone[0:143]  
-    zone_FR = zone[144:287]
-    zone_F = zone[288:431]
-    zone_FL = zone[432:575]
-    zone_L = zone[576:719]
+    zone_R = zone[0:50]  # 30deg
+    zone_FR = zone[51:140]
+    zone_F = zone[141:220]
+    zone_FL = zone[221:310]
+    zone_L = zone[311:361]
 
     if front_obs_distance is None and left_obs_distance is None:
-        front_obs_distance = 1
-        left_obs_distance = 1
+        front_obs_distance = 2
+        left_obs_distance = 2
 
 
 def check_init_config():
@@ -224,7 +226,8 @@ def check_init_config():
         init_bot_pose = [bot_pose.position.x, bot_pose.position.y]
         bot_bug2()
 
-
+# While loop to keep checkuing if we have hit homing position and are facing the vines to takje an image
+# Shifts between states depending upon issues we see - mainly managing obsticles via wall following
 def bot_bug2():
     global bot_motion, currentBotState, bot_pose
     bot_motion = rospy.Publisher("/thorvald_001/teleop_joy/cmd_vel", Twist, queue_size=10)
@@ -251,7 +254,7 @@ def bot_bug2():
 
 
 
-
+# --------------------------------------------- main program entry --------------------------------------
 
 def init():
     global homing_signal
