@@ -1,8 +1,24 @@
-## robot_programming
+<!-- 
+Author:     Garry Clawson
+Date:       26th Jan 2022
+Module:     CMP9767M Robotic Programming
+Assignment: Assignment 1 - Grapebunch Detection  
+Version:    0.1.0  
+
+Comments:
+As part of the presentation requirement I will be branching this repo and using the README.md file as a presentation area, with visuals and videos to present my project.  This will be on a FORK called ASSIGN_1_PRESENTATION. I will then merge this into the MAIN afetr the presentation has passed. This will then allow other users to have much more detail about the project. I am noting this because you will see COMMITs to the rep but on a seperate branch.
+ -->
+
+
+## Robot Programming CMP9767M
+
+This repo contains the simuation of a vineyard with the challenge to count all the grape bucnhes across the vines. The specilaistaion in this project is around imaging and coloursegmentation, where a pipeline of tools was used through OpenCV to identy the bunches. 
+
+The navigation for this project uses a homing beacon system, and the BUG2 algorythm to avoid collision and reach certain image points through the vineyard. 
 
 ## Set Up Your System
 
-The following denotes the steps required to run and launch this project. You will need a GitHub account for best management of your files and also be familiar with Git command lines tools and the terminal. You will need Ubuntu 18.04 tio run this project.
+The following are the steps required to run and launch this project. You will need a GitHub account for best management of your files and also be familiar with Git command lines tools and the terminal. You will need Ubuntu 18.04 to run this project.
 
 1. Fork the `LCAS/CMP9767M` project from [https://github.com/LCAS/CMP9767M](https://github.com/LCAS/CMP9767M) as described in the [LCAS Wiki](https://github.com/LCAS/CMP9767M/wiki/Workshop-1---Introduction-and-ROS-Basics)
 
@@ -42,7 +58,20 @@ To launch more nodes we can include them in the launch file or call their respec
 
 ## Route Planning Overview
 
-TBC
+The path plannnig uses the [BUG2 algorythm](https://automaticaddison.com/the-bug2-algorithm-for-robot-motion-planning/) and a homing beacon system to avoid collisons and get to required points for image taking. 
+
+The algorthym is controlled by being in a series of states `LOOK_TOWARDS`, `GOAL_SEEK`, `WALL_FOLLOW` and `ROTATE_TO_VINES`. 
+
+1. `LOOK_TOWARDS` - This state rotates the robot towards the `HOMING_BEACON` which can be placed anywhere in the vineyard. Rather than use single end point I have used a series of these to act as points to take images at. Once pouinted towards the beacon the robto state will be changed to `GOAL_SEEK`.
+
+1. `GOAL_SEEK` - This moves the robot towards the goal (homing beacon) and if it encounters any obsticle it will change state to `WALL_FOLLOW`. The collison proximity params here are slightly larer than at `WALL_FOLLOW` so we can avoid getting closed into position. 
+
+1. `WALL'_FOLLOW` - This state moves the robot out of a collision area and will keep going until it interscts with the BUG2 `GOAL"_SEEK` line. It will then move to state `LOOK_TOWARDS` to again go to the `HOMING_BEACON`
+
+1. `ROTATE_TO"_VINES` - Once at the goal position, the robot will change state and rotate towards the vines ensuring that the KinectHD camera is facing the vines at 90 degrees (assumes the Vines are infac parrellel to the perimter wall - checks have shown it is)
+
+Once we are at the correct position and angle to take an image the counting process takes over. 
+
 
 ## Counting Process Overview
 
