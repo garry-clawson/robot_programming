@@ -178,10 +178,13 @@ def rotate_to_vines():
         twist.linear.x = 0.0
         twist.angular.z = kp * (target_rad-yaw_)
     else:
+        print("we are here")
         twist.angular.z = 0
         facing_vines = True
         currentBotState = BotState.TAKE_IMAGE
+        
     bot_motion.publish(twist)
+
         
 
 # --------------------------------------------- helper functions --------------------------------------
@@ -411,6 +414,8 @@ class image_listener:
 
 
     def detectGrapes(self, image, mask):
+        global taken_image
+
         grape_bunch_mask=cv2.bitwise_not(mask) # invert as blob detector will look for black pixels, ours is white
 
         # create the small border around the image. As the robot will move forwards down the row then don't catch the right border
@@ -436,10 +441,10 @@ class image_listener:
         #Counts the number of keypoints (grape bunches) in image
         grape_bunches_in_image = len(keypoints)
         if(grape_bunches_in_image != 0): # If a blob is detected, print out how many
-            
             print('Keypoints = ',grape_bunches_in_image)
         #cv2.imshow("detect keypoints image", im_with_keypoints)
         #cv2.waitKey(0)
+        taken_image = True # flags that we have now taken an image
         return im_with_keypoints, keypoints
 
     def saveImage(self, image):
