@@ -2,9 +2,9 @@
 
 # Inspired by --> https://github.com/bipul93/ros-bug2/blob/master/scripts/bot.py
 
-import rospy
+import rospy, sys
 from geometry_msgs.msg import PoseStamped
-from sensor_msgs.msg import LaserScan
+from sensor_msgs.msg import LaserScan, Image
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
@@ -12,8 +12,16 @@ from nav_msgs.msg import Odometry
 import enum
 import math
 import numpy
+#import numpy as np
+from cv_bridge import CvBridge, CvBridgeError
+from datetime import datetime
+import cv2
+from cv2 import namedWindow, cvtColor, imshow, inRange
 
-# --------------------------------------------- define variables --------------------------------------
+
+
+
+# --------------------------------------------- define variables and initialise --------------------------------------
 
 # Defining Bot States
 # We move between these states before we get to our desrired location depending on vineyard and obsticles
@@ -22,12 +30,14 @@ class BotState(enum.Enum):
     GOAL_SEEK = 1  # follow line
     WALL_FOLLOW = 2  # Go around the wall / avoid obstacles
     ROTATE_TO_VINES = 3 # Rotate towards vines to take camera image
+    TAKE_IMAGE = 4 # Take images along the vines
 
 # Initialised values
 yaw = 0
 yaw_threshold = math.pi / 90 #Set at 90 as this gives 2 degrees tolerence I found due to size of vineyard and testing at far edges 4 degs missed homing spots (could moke homing spot larger (line distance value)? - pros and cons)
 goal_distance_threshold = 0.5
 currentBotState = BotState.LOOK_TOWARDS
+
 # base scan laser range values
 maxRange = 3
 minRange = 0
@@ -40,15 +50,20 @@ init_config_complete = False
 wall_hit_point = None
 beacon_found = False
 facing_vines = False
+taken_image = False
 twist = Twist()
 distance_moved = 0
 front_obs_distance = None
 left_obs_distance = None
 wall_following = False
+
+#Rotation vairables
 #Target for rotation and smoothing speed (kp) used to slow down the rotation the closer we get to our target
-target = 180 # Target angle to achive ibn degrees (Note: this is the world view and is directly facuing the grape vines)
+target = -90 # Target angle to achive ibn degrees (Note: this is the world view and is directly facuing the grape vines)
 kp=0.5 # Slows the angle of rotation the closer you get to the desried angle (stops from overshooting)
 
+# Image couting variables
+image_count = 0
 
 # --------------------------------------------- movement functions --------------------------------------
 
@@ -137,54 +152,6 @@ def wall_follow():
         twist.angular.z = 0  # move forward
         twist.linear.x = 0.5
     bot_motion.publish(twist)
-
-
-# The below is more saphsiticated but runs into logical erros when changing between states (can get caught in a loop of > move > wall > goal > move ...)
-"""     if line_distance() < 0.2 and distance_moved > 0.5:
-        print("line_hit")
-        print(distance_moved)
-        # found line point. rotate and move forward via the LOOK_TOWARDS state
-        twist.angular.z = 0
-        twist.linear.x = 0
-        currentBotState = BotState.LOOK_TOWARDS
-        return
-    elif numpy.any((zone_F < 2)) and numpy.any((zone_FL > 2)) and numpy.any((zone_FR > 2)):
-        print("turn right")
-        twist.angular.z = -1
-        twist.linear.x = 0
-    elif numpy.any((zone_F > 2)) and numpy.any((zone_FL > 2)) and numpy.any((zone_FR < 2)):
-        print("turn right")
-        twist.angular.z = -1
-        twist.linear.x = 0
-    elif numpy.any((zone_F > 2)) and numpy.any((zone_FL < 2)) and numpy.any((zone_FR > 2)):
-        print("turn left")
-        twist.angular.z = 1
-        twist.linear.x = 0
-    elif numpy.any((zone_F < 2)) and numpy.any((zone_FL > 2)) and numpy.any((zone_FR < 2)):
-        print("turn right")
-        twist.angular.z = -1
-        twist.linear.x = 0
-    elif numpy.any((zone_F < 2)) and numpy.any((zone_FL < 2)) and numpy.any((zone_FR > 2)):
-        print("turn left")
-        twist.angular.z = 1
-        twist.linear.x = 0
-    elif numpy.any((zone_F < 2)) and numpy.any((zone_FL < 2)) and numpy.any((zone_FR < 2)):
-        print("turn right")
-        twist.angular.z = -1
-        twist.linear.x = 0
-    elif numpy.any((zone_F > 2)) and numpy.any((zone_FL < 2)) and numpy.any((zone_FR < 2)):
-        print("turn right")
-        twist.angular.z = -1
-        twist.linear.x = 0
-
-    bot_motion.publish(twist)   
- """
-
-
-
-
-
-
     
 
 # Rotates to face the vines according tpo the world view (-90 degrees). This uses the front IKinect HD camera but couuld have also used left or right 
@@ -194,7 +161,7 @@ def rotate_to_vines():
     global bot_motion, twist, bot_pose, target, currentBotState, yaw_threshold
     #bot_motion = rospy.Publisher("/thorvald_001/teleop_joy/cmd_vel", Twist, queue_size=10)
     target_rad = target*math.pi/180 #-90 degrees to face towards vines
-    print("bot pose", bot_pose)
+    #print("bot pose", bot_pose)
     # Change bot pose from Quarternion to euler to get the yaw and difference to target (-90 degrees)
     quaternion = (
         bot_pose.orientation.x,
@@ -213,6 +180,7 @@ def rotate_to_vines():
     else:
         twist.angular.z = 0
         facing_vines = True
+        currentBotState = BotState.TAKE_IMAGE
     bot_motion.publish(twist)
         
 
@@ -300,13 +268,14 @@ def check_init_config():
         init_bot_pose = [bot_pose.position.x, bot_pose.position.y]
         bot_bug2()
 
+# Comment:
 # While loop to keep checkuing if we have hit homing position and are facing the vines to takje an image
 # Shifts between states depending upon issues we see - mainly managing obsticles via wall following
 def bot_bug2():
     global bot_motion, currentBotState, bot_pose
     bot_motion = rospy.Publisher("/thorvald_001/teleop_joy/cmd_vel", Twist, queue_size=10)
     rate = rospy.Rate(10)
-    while not facing_vines:
+    while not taken_image:
         if not init_config_complete:
             return
         if currentBotState is BotState.LOOK_TOWARDS:
@@ -321,9 +290,170 @@ def bot_bug2():
         elif currentBotState is BotState.ROTATE_TO_VINES:
             print("Rotate to Vines")
             rotate_to_vines()
+        elif currentBotState is BotState.TAKE_IMAGE:
+            print("Taking Image")
+            image_listener()
             # return
         rate.sleep()
-    print("Facing vines")
+    print("Image captured")
+
+
+
+# --------------------------------------------- imaging class and functions --------------------------------------
+
+class image_listener:
+
+    def __init__(self):
+
+        # Enable OpenCV with ROS
+        self.bridge = CvBridge()
+        # Subscribe to front camera feed
+        self.image_sub = rospy.Subscriber("/thorvald_001/kinect2_front_camera/hd/image_color_rect",
+                                          Image, self.image_callback)
+
+    def image_callback(self, data):
+
+        global image_count #Counts the number of images taken
+        print("Received an image!")
+
+        try:
+            # Convert your ROS Image message to OpenCV2
+            cv2_img = self.bridge.imgmsg_to_cv2(data, "bgr8")
+        except CvBridgeError, e:
+            print(e)
+        else:
+            img_noBackground = self.removeBackGround(cv2_img) # remove background on start
+            img_removeVines = self.removeVines(img_noBackground)
+            image_count = image_count + 1
+            print("Count of images", image_count)
+            #self.saveImage(img_removeVines)
+
+
+    def removeBackGround(self, image):
+        # Remove background
+        HSVimage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV) # convert color space
+        #cv2.imshow("initial image", HSVimage)
+        #cv2.waitKey(0) 
+        #self.saveImage(HSVimage)
+
+
+        # between values for thresholding
+        min = numpy.array([35, 000, 000]) 
+        max = numpy.array([180, 253, 255]) 
+        mask = cv2.inRange(HSVimage, min, max) # threshold
+        bunch_image = cv2.bitwise_and(HSVimage, HSVimage, mask=mask) # obtain threshold result
+        im_NoBackground = cv2.cvtColor(bunch_image, cv2.COLOR_HSV2BGR) # reconvert color space for publishing
+        #cv2.imshow("Removed background", im_NoBackground)
+        #cv2.waitKey(0) 
+        return im_NoBackground
+
+
+    def removeVines(self, image):
+        HSVimage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)   # convert color space for thresholding
+        #cv2.imshow("HSVImage", HSVimage)
+        #cv2.waitKey(0) 
+        # mask out vine - values found by using hsv_range_detector.py
+        # inspired by https://www.youtube.com/watch?v=We6CQHhhOFo&t=136s  -> ROS and OpenCv for beginners | Blob Tracking and Ball Chasing with Raspberry Pi by Tiziano Fiorenzani
+        min = numpy.array([90, 000, 40])
+        max = numpy.array([255, 255, 255]) 
+        vinemask = cv2.inRange(HSVimage, min, max) # threshold
+        #cv2.imshow("vinemask", vinemask)
+        #cv2.waitKey(0) 
+        #self.saveImage(vinemask)
+
+        # Remove odd small spots
+        # Inspired by -> https://stackoverflow.com/a/42812226
+        dummy_image = vinemask.astype(numpy.uint8) # reconvert to uint8
+        #find all your connected components (white blobs in your image)
+        nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(dummy_image, connectivity=8)
+        #connectedComponentswithStats yields every seperated component with information on each of them, such as size
+        #the following part is just taking out the background which is also considered a component, but most of the time we don't want that.
+        sizes = stats[1:, -1]; nb_components = nb_components - 1
+        # minimum size of particles we want to keep (number of pixels)
+        #here, it's a fixed value, but you can set it as you want, eg the mean of the sizes or whatever
+        min_size = 60 # Value found through trial and error - since we are donig this pre dilation we need ot pick up smaller elements
+        #answer image
+        vinemask_updated = numpy.zeros((output.shape))
+        #for every component in the image, you keep it only if it's above min_size
+        for i in range(0, nb_components):
+            if sizes[i] >= min_size:
+                vinemask_updated[output == i + 1] = 255
+
+        vinemask_updated = vinemask_updated.astype(numpy.uint8) # reconvert to uint8
+        #cv2.imshow("vinemask updated", vinemask_updated)
+        #cv2.waitKey(0) 
+
+        # Increase size of remaining pixels
+        vinemask_updated = cv2.dilate(vinemask_updated, numpy.ones((15, 15)), iterations = 1) # expand mask
+        #cv2.imshow("diliated", vinemask_updated)
+        #cv2.waitKey(0) 
+
+        # Add kernal to complete the morphEx operation using morph_elispse (simular shape to grapes)
+        # Inspired by -> https://www.pyimagesearch.com/2021/04/28/opencv-morphological-operations/
+	    # construct a eliptic kernel (same shape as grapes) from the current size and then apply an "opening" operation to close the gaps
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
+        morph_vinemask = cv2.morphologyEx(vinemask_updated, cv2.MORPH_OPEN, kernel)
+        #cv2.imshow("MorphEx vinemask", morph_vinemask)
+        #cv2.waitKey(0)
+
+        # obtain threshold result
+        grapeBunchImage = cv2.bitwise_and(HSVimage, HSVimage, mask=morph_vinemask) 
+        #cv2.imshow("grapeBunchImage with MorphEx ANDED HSV image", grapeBunchImage)
+        #cv2.waitKey(0) 
+
+        # Detect the keypoints of the grape bunches in the image and count them
+        im_detectGrapes_with_keypoints, keypoints = self.detectGrapes(grapeBunchImage, morph_vinemask)
+        #cv2.imshow("Final Grape bunch Image", im_detectGrapes_with_keypoints)
+        #cv2.waitKey(0)
+        #self.saveImage(grapeBunchImage)
+        
+        return im_detectGrapes_with_keypoints
+
+
+    def detectGrapes(self, image, mask):
+        grape_bunch_mask=cv2.bitwise_not(mask) # invert as blob detector will look for black pixels, ours is white
+
+        # create the small border around the image. As the robot will move forwards down the row then don't catch the right border
+        # because the the nexct image the left border will catch any overlap and register it (hopefully!!)
+        # If the robot is too close this will work and if far enough away the border wont be required top/bottom
+        # Inspired by -> https://stackoverflow.com/questions/53064534/simple-blob-detector-does-not-detect-blobs
+        grape_bunch_mask=cv2.copyMakeBorder(grape_bunch_mask, top=1, bottom=1, left=1, right=0, borderType= cv2.BORDER_CONSTANT, value=[255,255,255] ) 
+
+        # FROM -> https://www.learnopencv.com/blob-detection-using-opencv-python-c/
+        # Inspired params from -> https://stackoverflow.com/questions/53064534/simple-blob-detector-does-not-detect-blobs 
+        # Note: Need the robot to sdand off so that grape bunches are at the image border - this impacts pixel masking params also!!
+        params = cv2.SimpleBlobDetector_Params() # initialize detection parameters
+        # Inspired by -> https://programmerall.com/article/3089974703/  
+        params.maxArea = 100000
+        params.minInertiaRatio = 0.05
+        params.minConvexity = .60
+        # Create a detector with the parameters
+        detector = cv2.SimpleBlobDetector_create(params)
+        # Detect blobs.
+        keypoints = detector.detect(grape_bunch_mask)
+        # Draw detected blobs as red circles. cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
+        im_with_keypoints = cv2.drawKeypoints(image, keypoints, numpy.array([]), (000,000,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        #Counts the number of keypoints (grape bunches) in image
+        grape_bunches_in_image = len(keypoints)
+        if(grape_bunches_in_image != 0): # If a blob is detected, print out how many
+            
+            print('Keypoints = ',grape_bunches_in_image)
+        #cv2.imshow("detect keypoints image", im_with_keypoints)
+        #cv2.waitKey(0)
+        return im_with_keypoints, keypoints
+
+    def saveImage(self, image):
+        # Save your OpenCV2 image as a jpeg 
+        time = datetime.now()
+        filepath = 'grape_bunches'+str(time)+'.jpg' 
+        print('saving to ',filepath)
+        cv2.imwrite(filepath, image)
+        #imshow("cv2", image)
+        rospy.sleep(1)
+
+
+
+
 
 
 
@@ -343,6 +473,6 @@ def init():
 if __name__ == '__main__':
     try:
         init()
-        
+       
     except rospy.ROSInterruptException:
         pass

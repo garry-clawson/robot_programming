@@ -1,8 +1,6 @@
 #! /usr/bin/python
 # coding=utf-8
 
-# Copyright (c) 2015, Rethink Robotics, Inc.
-
 # Using this CvBridge Tutorial for converting
 # ROS images to OpenCV2 images
 # http://wiki.ros.org/cv_bridge/Tutorials/ConvertingBetweenROSImagesAndOpenCVImagesPython
@@ -25,6 +23,9 @@ import numpy as np
 from datetime import datetime
 
 
+# --------------- global variables --------------
+image_count = 0
+
 class image_listener:
 
     def __init__(self):
@@ -36,6 +37,8 @@ class image_listener:
                                           Image, self.image_callback)
 
     def image_callback(self, data):
+
+        global image_count #Counts the number of images taken
         print("Received an image!")
 
         try:
@@ -46,12 +49,19 @@ class image_listener:
         else:
             img_noBackground = self.removeBackGround(cv2_img) # remove background on start
             img_removeVines = self.removeVines(img_noBackground)
-            self.saveImage(img_removeVines)
+            image_count = image_count + 1
+            print("Count of images", image_count)
+            #self.saveImage(img_removeVines)
 
 
     def removeBackGround(self, image):
         # Remove background
         HSVimage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV) # convert color space
+        #cv2.imshow("initial image", HSVimage)
+        #cv2.waitKey(0) 
+        #self.saveImage(HSVimage)
+
+
         # between values for thresholding
         min = np.array([35, 000, 000]) 
         max = np.array([180, 253, 255]) 
@@ -99,7 +109,7 @@ class image_listener:
         #cv2.waitKey(0) 
 
         # Increase size of remaining pixels
-        vinemask_updated = cv2.dilate(vinemask_updated, np.ones((15, 15)), iterations = 3) # expand mask
+        vinemask_updated = cv2.dilate(vinemask_updated, np.ones((15, 15)), iterations = 1) # expand mask
         #cv2.imshow("diliated", vinemask_updated)
         #cv2.waitKey(0) 
 
@@ -120,7 +130,7 @@ class image_listener:
         im_detectGrapes_with_keypoints, keypoints = self.detectGrapes(grapeBunchImage, morph_vinemask)
         #cv2.imshow("Final Grape bunch Image", im_detectGrapes_with_keypoints)
         #cv2.waitKey(0)
-        #self.saveImage(grapeBunchImage)
+        #self.saveImage(im_detectGrapes_with_keypoints)
         
         return im_detectGrapes_with_keypoints
 
@@ -148,8 +158,11 @@ class image_listener:
         keypoints = detector.detect(grape_bunch_mask)
         # Draw detected blobs as red circles. cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
         im_with_keypoints = cv2.drawKeypoints(image, keypoints, np.array([]), (000,000,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-        if(len(keypoints) != 0): # If a blob is detected, print out how many
-            print('Keypoints = ',len(keypoints))
+        #Counts the number of keypoints (grape bunches) in image
+        grape_bunches_in_image = len(keypoints)
+        if(grape_bunches_in_image != 0): # If a blob is detected, print out how many
+
+            print('Keypoints = ',grape_bunches_in_image)
         #cv2.imshow("detect keypoints image", im_with_keypoints)
         #cv2.waitKey(0)
         return im_with_keypoints, keypoints

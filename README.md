@@ -6,7 +6,7 @@ Assignment: Assignment 1 - Grapebunch Detection
 Version:    0.1.0  
 
 Comments:
-As part of the presentation requirement I will be branching this repo and using the README.md file as a presentation area, with visuals and videos to present my project.  This will be on a FORK called ASSIGN_1_PRESENTATION. I will then merge this into the MAIN afetr the presentation has passed. This will then allow other users to have much more detail about the project. I am noting this because you will see COMMITs to the rep but on a seperate branch.
+As part of the presentation requirement I will be branching this repo and using the README.md file as a presentation area, with visuals and videos to present my project.  This will be on a FORK called ASSIGN_1_PRESENTATION. I will then merge this into the MAIN afetr the presentation has taken place. This will then allow other users to have much more detail about the project. I am noting this because you will see COMMITs after submission but prior to the presentation to the rep but only on the ASSIGN_1_PRESENTATION branch. The MAIN banch will be the submitted code base and README.md.
  -->
 
 
@@ -14,7 +14,7 @@ As part of the presentation requirement I will be branching this repo and using 
 
 This repo contains the simuation of a vineyard with the challenge to count all the grape bucnhes across the vines. The specilaistaion in this project is around imaging and coloursegmentation, where a pipeline of tools was used through OpenCV to identy the bunches. 
 
-The navigation for this project uses a homing beacon system, and the BUG2 algorythm to avoid collision and reach certain image points through the vineyard. 
+The navigation for this project uses a homing beacon system, and the BUG2 algorythm to avoid any collisions through the vineyard. 
 
 ## Set Up Your System
 
@@ -81,9 +81,9 @@ The grape bunch counting process is achived through an imaging pipeline, using O
 - `cv2.cvtColor(image, cv2.COLOR_BGR2HSV)`: Convert to HSV image, apply thresholds then mask. A useful threshold tool is the [blob_detector.py](https://github.com/tizianofiorenzani/ros_tutorials/blob/master/opencv/include/blob_detector.py) by Tiziano Fiorenzani.
 - Repeat tghe above process but remove the green vines aplying a new threshold
 - We now have an image with lots of smaller white dots. We need ot rmeove this noise. We used `astype(np.uint8)` to convert to unit8, then `cv2.connectedComponentsWithStats(dummy_image, connectivity=8)` toi build a list of centriods of all white dots, we then remove any that are below 60 pixels. 
-- `cv2.dilate(vinemask_updated, np.ones((15, 15)), iterations = 3)` to [increase the size](https://opencv24-python-tutorials.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_morphological_ops/py_morphological_ops.html) of the remaining points. 
+- `cv2.dilate(vinemask_updated, np.ones((15, 15)), iterations = 1)` to [increase the size](https://opencv24-python-tutorials.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_morphological_ops/py_morphological_ops.html) of the mask points. 
 - We then use `cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))` to apply an eliptical shape to a following morphologyEx process
--`cv2.morphologyEx(vinemask_updated, cv2.MORPH_OPEN, kernel)` to open the pixels to create larger centroid regions. 
+-`cv2.morphologyEx(vinemask_updated, cv2.MORPH_OPEN, kernel)` to open the pixels to create larger centroid regions. The kernel size is critical here and we use 5,5. 7,7 opened up the image relative to distance image was being taken at.
 
 The following stage of the pipeline uses the `cv2.SimpleBlobDetector` to detect the grapes.
 

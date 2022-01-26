@@ -18,9 +18,9 @@ def talker():
     # Comment:
     # These are set manually but can be ste by passing params in the launch file
     # Great resource for ref -> https://campus-rover.gitbook.io/lab-notebook/faq/using-args-params-roslaunch 
-    # The x is  up and down and the y is the left right in this world view
-    home_pose.pose.position.x = -6
-    home_pose.pose.position.y = -4
+    # The x is  up and down and the y is the left right in this world view (minus is down or right)
+    home_pose.pose.position.x = -8
+    home_pose.pose.position.y = -4.5
     home_pose.pose.position.z = 0
 
     # Continue top publish homing beacon until shutdown
