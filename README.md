@@ -15,7 +15,7 @@ As part of the presentation requirement I will be branching this repo and using 
 
 This repository contains the simulation of a vineyard with the challenge to count all the grape bunches across the vines. The specialist area for this project was around imaging and colour segmentation, where a pipeline of tools was used through OpenCV to identify the bunches. 
 
-The navigation for this project uses a homing beacon system to get to a position, and the BUG2 algorithm to avoid any collisions as the robot traverses through the vineyard. A demonstration video is presneted below showing how thr torbot gets out of tight spaces to achieve a target goal point for image taking.
+The navigation for this project uses a homing beacon system to get to a position, and the BUG2 algorithm to avoid any collisions as the robot traverses through the vineyard. A demonstration video is presented below showing how the Thorvald robot gets out of tight spaces to achieve a target goal point, from an initial constrained pose, for image taking.
 
 https://user-images.githubusercontent.com/44243266/151281704-73a649ef-53f7-4e6f-acfe-41f06cd72c3c.mp4
 
@@ -112,4 +112,10 @@ The following stage of the pipeline uses the `cv2.SimpleBlobDetector` to detect 
 The distance to the vines is correlated to the field of view of the Kinect_v2 camera. This information can be found in the `src/bacchus_lcas/bacchus_gazebo/urdf/sensors/sensor_kinect_v2_.xaxro` file on line 109. This gives us a value of `<horizontal_fov>${84.1*3.14/180.0}</horizontal_fov>` which is around 1.467 rads for the viewing angle. The length of the vine hedge in the 'world_name:=vineyard_small' is 12 meters (found from visual inspection). At 2m from the hedge we will image 3.60794m of the hedge with the available field of view. Taking an image of the full vine hedge at 2m distance therefore requires 12 / 3.61 = 3.32 images. Or rather the last image will only have 1/3rd of the vine hedge on (if we take an image directly at the start of the hedge with the RHS at the border of the image). We need to be careful that we don't crop the top of the hedge if we are too close.
 
 The images are taken from right through left. As part of the process we use `cv2.SimpleBlobDetector`. The simple blob detector ignores keypoints on the boundary so a border was created with the right side of the border removed (so anything on the RHS would not be counted if it fell on the this line). As the robot moves down the vine row, anything missed out on the RHS is captured on the LHS image. This avoids the issue of double counting boundary grape bunches as long as we are careful with our positioning; however robot distance to hedge and camera FoV should be as accurate as possible to get sensible results.
+
+### Images Showing Count
+
+[HSV Image](images/HSVimage.png)]
+
+[Keypoints](images/HSVimage.png)]
 
