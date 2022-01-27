@@ -96,6 +96,10 @@ The images are taken from right through left. As part of the process we use `cv2
 
 ### Images Showing Count
 
+<p align="center"><img src="images/HSVimage.png"></p>
+
+<p align="center"><img src="images/Counted_grape_bunches"></p>
+
 [HSV Image](images/HSVimage.png)
 
 [Keypoints](images/HSVimage.png)
