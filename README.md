@@ -96,13 +96,14 @@ The images are taken from right through left. As part of the process we use `cv2
 
 ### Images Showing Count
 
+HSV Image:
+
 <p align="center"><img src="images/HSVimage.png"></p>
 
-<p align="center"><img src="images/Counted_grape_bunches"></p>
+Keypoints Image:
 
-[HSV Image](images/HSVimage.png)
+<p align="center"><img src="images/Counted_grape_bunches.png"></p>
 
-[Keypoints](images/HSVimage.png)
 
 ## Route Planning Overview
 
