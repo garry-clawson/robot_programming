@@ -30,7 +30,7 @@ The following are the steps required to run and launch this project. You will ne
 
 1. Copy the `LCAS/CMP9767M` project from step 1 into the `/src` folder of your new workspace (`catkin_ws/src`)
 
-1. Fork the contents of this[robot_programming](https://github.com/garry-clawson/robot_programming) repository and clone into the `catjkin_ws/src` folder.
+1. Create a folder called `grape_bunch_counter` within your `catjkin_ws/src` folder. Fork the contents of this[robot_programming](https://github.com/garry-clawson/robot_programming) repository and clone into the folder (this will be your *package* for the project). *Note: The `images` folder is not required and can be deleted and is only used for this README.md document.* 
 
 1. Now you have all the files you require to run the project. We need to complete the `catkin_make` process. To do this `roscd` to get the head of the files, then `cd ..` out of the `devel` folder. You should now be in the `catkin_ws` folder.  Use `catkin_make` to build your project.
 
