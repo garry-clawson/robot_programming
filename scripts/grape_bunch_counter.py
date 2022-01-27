@@ -31,6 +31,7 @@ class BotState(enum.Enum):
     WALL_FOLLOW = 2  # Go around the wall / avoid obstacles
     ROTATE_TO_VINES = 3 # Rotate towards vines to take camera image
     TAKE_IMAGE = 4 # Take images along the vines
+    #SECOND_BEACON = 5 # New beacon loaction to take further images (we can add as many as we like)
 
 # Initialised values
 yaw = 0
@@ -50,6 +51,7 @@ init_config_complete = False
 wall_hit_point = None
 beacon_found = False
 taken_image = False
+#second_beacon = False
 twist = Twist()
 distance_moved = 0
 front_obs_distance = None
@@ -178,13 +180,10 @@ def rotate_to_vines():
         twist.angular.z = kp * (target_rad-yaw_)
     else:
         twist.angular.z = 0
-        print("VINES TRUE")
         currentBotState = BotState.TAKE_IMAGE
         return
 
     bot_motion.publish(twist)
-
-    
 
         
 
@@ -304,16 +303,12 @@ def bot_bug2():
             image_listener()
             return
         rate.sleep()
-    print("Image captured")
-
-
-
+    #print("Image captured")
 
 
 # --------------------------------------------- ported imaging class and functions --------------------------------------
 
 class image_listener:
-    print("entered listener")
 
     def __init__(self):
         # Enable OpenCV with ROS
@@ -325,7 +320,7 @@ class image_listener:
     def image_callback(self, data):
 
         global image_count #Counts the number of images taken
-        print("Received an image!")
+        #print("Received an image!")
 
         try:
             # Convert your ROS Image message to OpenCV2
@@ -336,9 +331,9 @@ class image_listener:
             img_noBackground = self.removeBackGround(cv2_img) # remove background on start
             img_removeVines = self.removeVines(img_noBackground)
             image_count = image_count + 1
-            print("Count of images", image_count)
+            #print("Count of images", image_count)
             #self.saveImage(img_removeVines)
-
+            return
 
     def removeBackGround(self, image):
         # Remove background
@@ -447,7 +442,7 @@ class image_listener:
         #Counts the number of keypoints (grape bunches) in image
         grape_bunches_in_image = len(keypoints)
         if(grape_bunches_in_image != 0): # If a blob is detected, print out how many
-            print('Keypoints = ',grape_bunches_in_image)
+            print('Grape bunches = ', grape_bunches_in_image)
         #cv2.imshow("detect keypoints image", im_with_keypoints)
         #cv2.waitKey(0)
         taken_image = True # flags that we have now taken an image
@@ -465,15 +460,11 @@ class image_listener:
 
 
 
-
-
-
-
 # --------------------------------------------- main program entry --------------------------------------
 
 def init():
     global homing_signal
-    rospy.init_node("navigation")
+    rospy.init_node("grape_bunch_counter")
 
     homing_signal = rospy.Subscriber('/homing_signal', PoseStamped, callback)
 
@@ -482,7 +473,7 @@ def init():
     rospy.Subscriber('/thorvald_001/front_scan', LaserScan, process_sensor_info)
     rospy.Subscriber('/thorvald_001/odometry/base_raw', Odometry, get_base_truth)
 
-    print('--------- navigation has started -----------')
+    print('--------- grape bunch counter has started -----------')
     rospy.spin()
 
 

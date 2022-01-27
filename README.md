@@ -41,19 +41,26 @@ Update the `sensor_hokuyo_laser.xacro` file found in `src/bacchus_lcas/bacchus_g
 
 This will update the laser to scan across a -180 to 180 field of view. You will still have 720 data points (now more closely aligned) to work with. This could play to our advantage as we get a densor cluster of scans for analysis.
 
+### Update Thorvlad Spawn Point
+
+To demosntrate the navigation aspects the spwn poinut for Thorvlad can be amend to behind the vine hedge. This can be done be updating the values on lines 30 and 31 in file `src/bacchus_lcas/bacchus_gazebo/urdf/launch/vineyard_demo.launch` to
+`xxx`
+
+This will update the laser to scan across a -180 to 180 field of view. You will still have 720 data points (now more closely aligned) to work with. This could play to our advantage as we get a densor cluster of scans for analysis.
+
 ## How to launch the project
 
 To launch the robot, type the following in the terminal (note: using roslaunch instead of rosrun will launch roscore automatically):
 
-`roslaunch grape_bunch_counter grape_bunch_counter.launch`
+1. `roslaunch grape_bunch_counter grape_bunch_counter.launch`
 
-This will call the package and the associated launch files. This launch file consists of two simple components along with additional launch parameters:
+1. `rosrun grape_bunch_counter homing_beacon.py`
 
-1) The node details for the relevent .py files
+This will call the package and associated launch and .py files. This launch file consists of two simple components along with additional launch parameters:
 
-2) An <include> which finds the bacchus_gazebo vineyard demo launch (launches the vineyard_small as default)
+- The node details for the relevent .py files
 
-To launch more nodes we can include them in the launch file or call their respective packages and python files throughout the simulation.
+- An <include> which finds the bacchus_gazebo vineyard demo launch (launches the vineyard_small as default)
 
 
 ## Route Planning Overview
