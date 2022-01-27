@@ -4,6 +4,7 @@ Date:       26th Jan 2022
 Module:     CMP9767M Robotic Programming
 Assignment: Assignment 1 - Grape Bunch Detection  
 Version:    0.1.0  
+Link:       https://github.com/garry-clawson/robot_programming
 
 Comments:
 As part of the presentation requirement I will be branching this repo and using the README.md file as a presentation area, with visuals and videos to present my project.  This will be on a FORK called ASSIGN_1_PRESENTATION. I will then merge this into the MAIN after the presentation has taken place. This will then allow other users to have much more detail about the project. I am noting this because you will see COMMITs after submission but prior to the presentation to the rep but only on the ASSIGN_1_PRESENTATION branch. The MAIN branch will be the submitted code base and README.md.
@@ -14,7 +15,10 @@ As part of the presentation requirement I will be branching this repo and using 
 
 This repository contains the simulation of a vineyard with the challenge to count all the grape bunches across the vines. The specialist area for this project was around imaging and colour segmentation, where a pipeline of tools was used through OpenCV to identify the bunches. 
 
-The navigation for this project uses a homing beacon system to get to a position, and the BUG2 algorithm to avoid any collisions as the robot traverses through the vineyard. Demonstration videos are presented below:
+The navigation for this project uses a homing beacon system to get to a position, and the BUG2 algorithm to avoid any collisions as the robot traverses through the vineyard. A demonstration video is presneted below showing how thr torbot gets out of tight spaces to achieve a target goal point for image taking.
+
+https://user-images.githubusercontent.com/44243266/151281704-73a649ef-53f7-4e6f-acfe-41f06cd72c3c.mp4
+
 
 ## Set Up Your System
 
@@ -31,7 +35,7 @@ The following are the steps required to run and launch this project. You will ne
 1. Now you have all the files you require to run the project. We need to complete the `catkin_make` process. To do this `roscd` to get the head of the files, then `cd ..` out of the `devel` folder. You should now be in the `catkin_ws` folder.  Use `catkin_make` to build your project.
 
 
-### Update Hokuyo Sensor Profiles
+### Update Hokuyo Sensor Profile
 
 The front and back sensor is use the Hokuya laser. This is set to min and max capability and gives an uneven range around the robot, especially if you divide the sensor laser scan into zones for LEFT, LEFTFRONT, FRONT and so on. The laser is also 45 degrees offset. To adjust this, update the `sensor_hokuyo_laser.xacro` file found in `src/bacchus_lcas/bacchus_gazebo/urdf/bacchus_sensors.xaxro` and change line 21, 22 and 29,30 to:
 
