@@ -24,6 +24,8 @@ https://user-images.githubusercontent.com/44243266/151281704-73a649ef-53f7-4e6f-
 
 The following are the steps required to run and launch this project. You will need a GitHub account for best management of your files and also be familiar with the Git command lines tools and terminal. You will need Ubuntu 18.04 to run this project due to ROS requirements.
 
+1. Make sure you are upto date and run `sudo apt-get update && sudo apt-get upgrade`
+
 1. Fork the `LCAS/CMP9767M` project from [https://github.com/LCAS/CMP9767M](https://github.com/LCAS/CMP9767M) as described in the [LCAS Wiki](https://github.com/LCAS/CMP9767M/wiki/Workshop-1---Introduction-and-ROS-Basics)
 
 1. Create a catkin_ws by following the fantastic [ROS catkin tutorials](http://wiki.ros.org/catkin/Tutorials/create_a_workspace)

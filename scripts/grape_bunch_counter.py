@@ -337,6 +337,7 @@ class image_listener:
 
     def removeBackGround(self, image):
         # Remove background
+        # Insp[ired from -> https://github.com/TheMemoryDealer/Robot-Programming-CMP9767M/blob/main/weeder/src/vision.py]
         HSVimage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV) # convert color space
         #cv2.imshow("initial image", HSVimage)
         #cv2.waitKey(0) 
