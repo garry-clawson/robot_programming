@@ -87,7 +87,7 @@ The algorithm is controlled by being in a series of states `LOOK_TOWARDS`, `GOAL
 Once we are at the correct position and angle to take an image the counting process takes over. 
 
 
-## Counting Process Overview
+## Grape Bunch Counting Process Overview
 
 The grape bunch counting process is achieved through an imaging pipeline, using OpenCV, as follows:
 
