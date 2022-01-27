@@ -30,7 +30,7 @@ The following are the steps required to run and launch this project. You will ne
 
 1. Copy the `LCAS/CMP9767M` project from step 1 into the `/src` folder of your new workspace (`catkin_ws/src`)
 
-1. Create a folder called `grape_bunch_counter` within your `catjkin_ws/src` folder. Fork the contents of this[robot_programming](https://github.com/garry-clawson/robot_programming) repository and clone into the folder (this will be your *package* for the project). *Note: The `images` folder is not required and can be deleted and is only used for this README.md document.* 
+1. Create a folder called `grape_bunch_counter` within your `catkin_ws/src` folder. Fork the contents of this [robot_programming](https://github.com/garry-clawson/robot_programming) repository and clone into the `grape_bunch_counter` folder (this will be your *package* for the project). *Note: The `images` folder is not required and can be deleted and is only used for this README.md document.* 
 
 1. Now you have all the files you require to run the project. We need to complete the `catkin_make` process. To do this `roscd` to get the head of the files, then `cd ..` out of the `devel` folder. You should now be in the `catkin_ws` folder.  Use `catkin_make` to build your project.
 
@@ -40,6 +40,7 @@ The following are the steps required to run and launch this project. You will ne
 The front and back sensor is use the Hokuya laser. This is set to min and max capability and gives an uneven range around the robot, especially if you divide the sensor laser scan into zones for LEFT, LEFTFRONT, FRONT and so on. The laser is also 45 degrees offset. To adjust this, update the `sensor_hokuyo_laser.xacro` file found in `src/bacchus_lcas/bacchus_gazebo/urdf/bacchus_sensors.xaxro` and change line 21, 22 and 29,30 to:
 
 `min_angle="-0.7854"`
+
 `max_angle="2.3562"`
 
 This will update the laser to scan across a -180 to 180 field of view. You will still have 720 laser data points to work with. 
@@ -49,6 +50,7 @@ This will update the laser to scan across a -180 to 180 field of view. You will 
 To demonstrate the navigation aspects and collision avoidance, the spawn points for Thorvald can be amended to behind the vine hedge. This can be done be updating the values on lines 36 and 37 in file `src/bacchus_lcas/bacchus_gazebo/urdf/launch/vineyard_demo.launch` to the following:
 
 `<arg name="X_INIT" value="-10.0" unless="$(arg riseholme_dt)"/>`
+
 `<arg name="Y_INIT" value="-10.0" unless="$(arg riseholme_dt)"/>`
 
 This will position the Thorvald robot in the bottom right hand corner near two wall edges and the bottom of the vineyard. 
