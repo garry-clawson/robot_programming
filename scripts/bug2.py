@@ -18,7 +18,7 @@ from datetime import datetime
 import cv2
 from cv2 import namedWindow, cvtColor, imshow, inRange
 
-
+from subprocess import Popen
 
 
 # --------------------------------------------- define variables and initialise --------------------------------------
@@ -49,7 +49,6 @@ homing_signal = None  # subscriber
 init_config_complete = False
 wall_hit_point = None
 beacon_found = False
-facing_vines = False
 taken_image = False
 twist = Twist()
 distance_moved = 0
@@ -158,7 +157,7 @@ def wall_follow():
 # hand camera here
 def rotate_to_vines():
     print("rotating to vines")
-    global bot_motion, twist, bot_pose, target, currentBotState, yaw_threshold
+    global bot_motion, twist, bot_pose, target, currentBotState, yaw_threshold, facing_vines
     #bot_motion = rospy.Publisher("/thorvald_001/teleop_joy/cmd_vel", Twist, queue_size=10)
     target_rad = target*math.pi/180 #-90 degrees to face towards vines
     #print("bot pose", bot_pose)
@@ -178,12 +177,14 @@ def rotate_to_vines():
         twist.linear.x = 0.0
         twist.angular.z = kp * (target_rad-yaw_)
     else:
-        print("we are here")
         twist.angular.z = 0
-        facing_vines = True
+        print("VINES TRUE")
         currentBotState = BotState.TAKE_IMAGE
-        
+        return
+
     bot_motion.publish(twist)
+
+    
 
         
 
@@ -212,8 +213,13 @@ def callback(msg):
     global beacon_pose
     beacon_pose = msg.pose
     check_init_config()
-    # goal_location.unregister()
     rospy.wait_for_message("homing_signal", PoseStamped)
+
+#def callback_2(msg):
+#    global beacon_pose
+#    beacon_pose = msg.pose
+#    check_init_config()
+#    rospy.wait_for_message("homing_signal_2", PoseStamped)
 
 # Bot pose position relative to homing beacon
 def get_base_truth(bot_data):
@@ -277,7 +283,7 @@ def check_init_config():
 def bot_bug2():
     global bot_motion, currentBotState, bot_pose
     bot_motion = rospy.Publisher("/thorvald_001/teleop_joy/cmd_vel", Twist, queue_size=10)
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(20)
     while not taken_image:
         if not init_config_complete:
             return
@@ -296,18 +302,20 @@ def bot_bug2():
         elif currentBotState is BotState.TAKE_IMAGE:
             print("Taking Image")
             image_listener()
-            # return
+            return
         rate.sleep()
     print("Image captured")
 
 
 
-# --------------------------------------------- imaging class and functions --------------------------------------
+
+
+# --------------------------------------------- ported imaging class and functions --------------------------------------
 
 class image_listener:
+    print("entered listener")
 
     def __init__(self):
-
         # Enable OpenCV with ROS
         self.bridge = CvBridge()
         # Subscribe to front camera feed
@@ -338,8 +346,6 @@ class image_listener:
         #cv2.imshow("initial image", HSVimage)
         #cv2.waitKey(0) 
         #self.saveImage(HSVimage)
-
-
         # between values for thresholding
         min = numpy.array([35, 000, 000]) 
         max = numpy.array([180, 253, 255]) 
@@ -408,7 +414,7 @@ class image_listener:
         im_detectGrapes_with_keypoints, keypoints = self.detectGrapes(grapeBunchImage, morph_vinemask)
         #cv2.imshow("Final Grape bunch Image", im_detectGrapes_with_keypoints)
         #cv2.waitKey(0)
-        #self.saveImage(grapeBunchImage)
+        #self.saveImage(im_detectGrapes_with_keypoints)
         
         return im_detectGrapes_with_keypoints
 
@@ -467,11 +473,16 @@ class image_listener:
 
 def init():
     global homing_signal
-    rospy.init_node("bug2")
+    rospy.init_node("navigation")
+
     homing_signal = rospy.Subscriber('/homing_signal', PoseStamped, callback)
+
+    #homing_signal_2 = rospy.Subscriber('/homing_signal_2', PoseStamped, callback_2)
+
     rospy.Subscriber('/thorvald_001/front_scan', LaserScan, process_sensor_info)
     rospy.Subscriber('/thorvald_001/odometry/base_raw', Odometry, get_base_truth)
-    print('--------- bug2 has started -----------')
+
+    print('--------- navigation has started -----------')
     rospy.spin()
 
 
