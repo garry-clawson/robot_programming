@@ -53,7 +53,7 @@ To demonstrate the navigation aspects and collision avoidance, the spawn points 
 
 `<arg name="Y_INIT" value="-10.0" unless="$(arg riseholme_dt)"/>`
 
-This will position the Thorvald robot in the bottom right hand corner near two wall edges and the bottom of the vineyard. 
+This will position the Thorvald robot in the bottom right hand corner near two wall edges and the bottom of the vineyard as per the demonstration video above.
 
 ## How to launch the Project
 
