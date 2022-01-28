@@ -79,6 +79,8 @@ You should then source your terminal by running:
 
 1. Now you have all the files you require to run the project. We need to complete the `catkin_make` process. To do this `roscd` to get the head of the files, then `cd ..` out of the `devel` folder. You should now be in the `catkin_ws` folder.  Use `catkin_make` to build your project.
 
+1. A nice way to see if this has been successfull is to type `roslaunch` then double tab and you should see the package, `grape_bunch_counter`, as an option. Another double tab should then show, `grape_bunch_counter.launch`.
+
 
 ### Update Hokuyo Sensor Profile
 
