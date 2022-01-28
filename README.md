@@ -28,9 +28,7 @@ The following are the steps required to run and launch this project. You will ne
 
 1. Fork the `LCAS/CMP9767M` project from [https://github.com/LCAS/CMP9767M](https://github.com/LCAS/CMP9767M) as described in the [LCAS Wiki](https://github.com/LCAS/CMP9767M/wiki/Workshop-1---Introduction-and-ROS-Basics)
 
-1. To summarose the above you will need to do the following:
-
-`sudo apt-get install ros-melodic-uol-cmp9767m-base ros-melodic-desktop`
+1. Install the following packages:
 
 ```
 sudo apt-get install \
