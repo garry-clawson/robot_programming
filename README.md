@@ -32,7 +32,8 @@ The following are the steps required to run and launch this project. You will ne
 
 `sudo apt-get install ros-melodic-uol-cmp9767m-base ros-melodic-desktop`
 
-`sudo apt-get install \
+```
+sudo apt-get install \
     ros-melodic-opencv-apps \
     ros-melodic-rqt-image-view \
     ros-melodic-uol-cmp9767m-base \
@@ -64,8 +65,8 @@ The following are the steps required to run and launch this project. You will ne
     ros-melodic-topological-navigation \
     ros-melodic-topological-navigation-msgs \
     ros-melodic-strands-navigation
-    ros-melodic-gmapping`
-
+    ros-melodic-gmapping
+```
 You should then source your terminal by running:
 
 `source /opt/ros/melodic/setup.bash`
