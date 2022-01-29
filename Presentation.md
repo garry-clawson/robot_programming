@@ -24,9 +24,13 @@
 
 ## Explain My Approach to the Problem
 
+Add images here to show results at each stage and discuss limitations and problems I come across
+
 ### State Update through the program
 
 ### BUG2
+
+1. Explain what it is and why it was chosen over BUG0 or BUG1
 
 1. Homing Beacons
 
