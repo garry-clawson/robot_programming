@@ -1,6 +1,8 @@
 
 ### Root Programming - CMP9767M Grapevine Bunch Detection
 
+https://docs.google.com/presentation/d/1FuE3A1aroXwpHDm40s5xWv4lMTm8JGdwhloraxSf0gE/edit?usp=sharing 
+
 ## Introduction to Problem
 
 To detect and count the crop yield of a vine yard. This must be accomplished by navigating a Thorvald robot autonomously to count all grape bunches present in the vineyard. 
