@@ -102,7 +102,7 @@ HSV Image (Vineyard Small) and Keypoints Image (Vineyard Small):
 HSV Image (Vineyard Stahe 4 Small) and Keypoints Image (Vineyard Stage 4 Small):
 
 <p float="left">
-  <img src="images/st4_small.png" width="48%" height="300px" />
+  <img src="images/st4_small.jpg" width="48%" height="300px" />
   <img src="images/stg4_small.png" width="48%" height="300px" /> 
 </p>
 
