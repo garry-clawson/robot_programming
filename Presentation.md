@@ -13,7 +13,7 @@ As part of the presentation requirement I will be branching this repo and using 
 
 ## Robot Programming CMP9767M
 
-This repository contains the simulation of a vineyard with the challenge to count all the grape bunches across the vines. The specialist area for this project was around imaging and colour segmentation, where a pipeline of tools was used through OpenCV to identify the bunches. 
+This repository contains the simulation of a vineyard with the challenge to count all the grape bunches across the vines. The focus area for this project was around image perception, where a pipeline of tools was used through OpenCV to identify the bunches. 
 
 The navigation for this project uses a homing beacon system to get to a position, and the BUG2 algorithm to avoid any collisions as the robot traverses through the vineyard. A demonstration video is presented below showing how the Thorvald robot gets out of tight spaces to achieve a target goal point, from an initial constrained pose, for image taking.
 
@@ -22,8 +22,13 @@ https://user-images.githubusercontent.com/44243266/151281704-73a649ef-53f7-4e6f-
 
 ## Pre-Condition's Required
 
+1. Crops to be laid out with a gap of at least 5 meters between each row - this is due to the size of the robot (for rotation and positioning requirements) but also ensuring image is not cropped at the top/bottom of vine.
 
-TBC
+1. Orientation of the crops can be in either direction as long as the `HOMING_BEACON` points are positioned 2m from the vine hedge (to ensure images are not cropped)
+
+1. Odometry messages are subscribed to to identify the orientation of the ThorVald. Testing on the course ground has shown few repeatability (variance of 5%) issues when taking images and counting the grape bunches. 
+
+1. The perimeter wall is required as the program utililises the BUG2 wall follower algorithm for obstacle avoidance.
 
 ## Route Planning Overview
 
