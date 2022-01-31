@@ -92,13 +92,12 @@ The following stage of the pipeline uses the `cv2.SimpleBlobDetector` to detect 
 
 ### Perception Overview
 
-HSV Image- Vineyard Small:
+HSV Image (Vineyard Small) and Keypoints Image (Vineyard Small):
 
-<p align="center"><img src="images/HSVimage.png" style="width:700px;"></p>
-
-Keypoints Image - Vineyard Small:
-
-<p align="center"><img src="images/Counted_grape_bunches.png" style="width:700px;"></p>
+<p float="left">
+  <img src="images/HSVimage.png" width="40%" />
+  <img src="/images/Counted_grape_bunches.png" width="40%" /> 
+</p>
 
 HSV Image- Vineyard Stage 4 Small:
 
@@ -111,8 +110,7 @@ Keypoints Image - Vineyard Stage 4 Small:
 
 <p float="left">
   <img src="images/HSVimage.png" width="350px" />
-  <img src="/images/HSVimage.png" width="350px" /> 
-  <img src="images/HSVimage.png" width="350px" />
+  <img src="/images/Counted_grape_bunches.png" width="350px" /> 
 </p>
 
 
