@@ -38,7 +38,7 @@ https://user-images.githubusercontent.com/44243266/151281704-73a649ef-53f7-4e6f-
 
 ## Route Planning Overview
 
-The path planning uses the [BUG2 algorithm](https://automaticaddison.com/the-bug2-algorithm-for-robot-motion-planning/) and a homing beacon system to avoid collisions and get to required points for image taking. 
+Path planning uses the [BUG2 algorithm](https://automaticaddison.com/the-bug2-algorithm-for-robot-motion-planning/) and a homing beacon system to avoid collisions and get to required points for image taking. 
 
 The algorithm is controlled by being in a series of states `LOOK_TOWARDS`, `GOAL_SEEK`, `WALL_FOLLOW`, `ROTATE_TO_VINES` and `HOMING_BEACON`.
 
@@ -52,15 +52,15 @@ The algorithm is controlled by being in a series of states `LOOK_TOWARDS`, `GOAL
 
 <p align="center"><img src="images/goal_seek.png" style="width:700px;"></p>
 
-- `WALL'_FOLLOW` - This state moves the robot out of a collision area and will keep going until it intersects with the BUG2 `GOAL"_SEEK` line. It will then move to state `LOOK_TOWARDS` to again go to the `HOMING_BEACON`
+- `WALL_FOLLOW` - This state moves the robot out of a collision area and will keep going until it intersects with the BUG2 `GOAL"_SEEK` line. It will then move to state `LOOK_TOWARDS` to again go to the `HOMING_BEACON`
 
 <p align="center"><img src="images/wall_follow.png" style="width:700px;"></p>
 
-- `ROTATE_TO"_VINES` - Once at the goal position, the robot will change state and rotate towards the vines ensuring that the KinectHD camera is facing the vines at 90 degrees (assumes the vine hedge is parallel to the perimeter wall - checks have shown it is)
+- `ROTATE_TO_VINES` - Once at the goal position, the robot will change state and rotate towards the vines ensuring that the KinectHD camera is facing the vines at 90 degrees (assumes the vine hedge is parallel to the perimeter wall - checks have shown it is)
 
 <p align="center"><img src="images/rotate_to_vines.png" style="width:700px;"></p>
 
-- `HOMING_BEACON` - The homing beacon brings the activities above together by giving them a target to move towards. This target is the location for an image to be taken, but could with little adjustment could be at the end of a vineyard, ensuring that the robot safely traverses all obstacles while running along vine rows towards its destination [*Note: BUG1 will fully traverse a full row and BUG2 will traverse up to the closest point tof the goal, then move off the wall/vine to the next one*]
+- `HOMING_BEACON` - The homing beacon brings the activities above together by giving them a target position to move towards. This target currently being the location for an image to be taken. However, amending this target to be at the end of a vineyard, the robot could safely traverses all obstacles while running along vine rows towards its destination taking images governed by odometry or Lidar positioning constraints [*Note: BUG1 will fully traverse a full row and BUG2 will traverse up to the closest point nearest the goal, then move off the wall/vine to twards its target.*]
 
 <p align="center"><img src="images/homing_beacon.png" style="width:700px;"></p>
 
