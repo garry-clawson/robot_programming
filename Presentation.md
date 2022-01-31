@@ -94,7 +94,7 @@ The following stage of the pipeline uses the `cv2.SimpleBlobDetector` to detect 
 
 HSV Image (Vineyard Small) and Keypoints Image (Vineyard Small):
 
-<p float="left">
+<p float="center">
   <img src="images/HSVimage.png" width="48%" height="300px" />
   <img src="/images/Counted_grape_bunches.png" width="48%" height="300px" /> 
 </p>
