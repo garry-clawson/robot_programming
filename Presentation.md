@@ -13,22 +13,28 @@ As part of the presentation requirement I will be branching this repo and using 
 
 ## Robot Programming CMP9767M
 
-This repository contains the simulation of a vineyard with the challenge to count all the grape bunches across the vines. The focus area for this project was around image perception, where a pipeline of tools was used through OpenCV to identify the bunches. 
+This repository contains the simulation of a vineyard with the challenge to count all the grape bunches across the vines. The focus area for this project was image perception, where a pipeline of tools was used through OpenCV to accurately identify the grape bunches. 
 
-The navigation for this project uses a homing beacon system to get to a position, and the BUG2 algorithm to avoid any collisions as the robot traverses through the vineyard. A demonstration video is presented below showing how the Thorvald robot gets out of tight spaces to achieve a target goal point, from an initial constrained pose, for image taking.
+The navigation for this project uses a homing beacon system to get to a position, and the BUG2 algorithm to avoid any collisions as the robot traverses through the vineyard. 
+
+The key aspect of the project the was to complete the counting as accurately and as quickly as possible. The solution proposed has several innovative features that enable.
+
+A demonstration video is presented below showing how the Thorvald robot gets out of tight spaces to achieve a target goal point, from an initial constrained pose,to take an image of a grape vine. This is achieved by placing a homing_beacon at a required image point. Several homing_beacons can potentially be deployed to achieve as much coverage of the vine rows as required.
 
 https://user-images.githubusercontent.com/44243266/151281704-73a649ef-53f7-4e6f-acfe-41f06cd72c3c.mp4
 
 
 ## Pre-Condition's Required
 
-1. Crops to be laid out with a gap of at least 5 meters between each row - this is due to the size of the robot (for rotation and positioning requirements) but also ensuring image is not cropped at the top/bottom of vine.
+1. Crops to be laid out with a gap of at least 4 meters between each row - this is due to the size of the robot (for rotation and positioning requirements) but also ensuring images are not cropped at the top or bottom of vine.
 
-1. Orientation of the crops can be in either direction as long as the `HOMING_BEACON` points are positioned 2m from the vine hedge (to ensure images are not cropped)
+1. Orientation of the crops can be in either in the longitudinal or horizontal direction, as long as the `HOMING_BEACON` points are positioned 2m from the vine hedge (to ensure images are not cropped).
 
-1. Odometry messages are subscribed to to identify the orientation of the ThorVald. Testing on the course ground has shown few repeatability (variance of 5%) issues when taking images and counting the grape bunches. 
+1. Odometry messages are subscribed to, to maintain the orientation of the ThorVald. Testing on the course ground has shown few repeatability (variance of 5%) issues when taking images and counting the grape bunches. 
 
 1. The perimeter wall is required as the program utililises the BUG2 wall follower algorithm for obstacle avoidance.
+
+1. 
 
 ## Route Planning Overview
 
