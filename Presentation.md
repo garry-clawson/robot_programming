@@ -110,9 +110,9 @@ Keypoints Image - Vineyard Stage 4 Small:
 
 
 <p float="left">
-  <img src="images/HSVimage.png" width="100" />
-  <img src="/images/HSVimage.png" width="100" /> 
-  <img src="images/HSVimage.png" width="100" />
+  <img src="images/HSVimage.png" width="350px" />
+  <img src="/images/HSVimage.png" width="350px" /> 
+  <img src="images/HSVimage.png" width="350px" />
 </p>
 
 
