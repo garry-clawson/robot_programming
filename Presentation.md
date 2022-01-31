@@ -69,7 +69,7 @@ The algorithm is controlled by being in a series of states `LOOK_TOWARDS`, `GOAL
 Once we are at the correct position and angle to take an image the counting process takes over. 
 
 
-## Grape Bunch Counting Process Overview
+## Grape Bunch Counting Process Pipeline
 
 The grape bunch counting process is achieved through an imaging pipeline, using OpenCV, as follows:
 
@@ -90,28 +90,22 @@ The following stage of the pipeline uses the `cv2.SimpleBlobDetector` to detect 
 1. The final step is the accumulation of the `keypoints` count. We do this for the images taken across the length of the vine and sum the total bunches (keypoints identified in each image) found for a total count of grape bunches. We display this to the terminal for the user.
 
 
-### Perception Overview
+### Grape Bunch Counting Process Pipeline
 
 HSV Image (Vineyard Small) and Keypoints Image (Vineyard Small):
 
-<p float="center">
+<p float="left">
   <img src="images/HSVimage.png" width="48%" height="300px" />
   <img src="/images/Counted_grape_bunches.png" width="48%" height="300px" /> 
 </p>
 
-HSV Image- Vineyard Stage 4 Small:
-
-<p align="center"><img src="images/st4_small.png" style="width:700px;"></p>
-
-Keypoints Image - Vineyard Stage 4 Small:
-
-<p align="center"><img src="images/stg4_small.png" style="width:700px;"></p>
-
+HSV Image (Vineyard Stahe 4 Small) and Keypoints Image (Vineyard Stage 4 Small):
 
 <p float="left">
-  <img src="images/HSVimage.png" width="350px" />
-  <img src="/images/Counted_grape_bunches.png" width="350px" /> 
+  <img src="images/st4_small.png" width="48%" height="300px" />
+  <img src="images/stg4_small.png" width="48%" height="300px" /> 
 </p>
+
 
 
 
