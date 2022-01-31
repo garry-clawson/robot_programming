@@ -42,29 +42,29 @@ The path planning uses the [BUG2 algorithm](https://automaticaddison.com/the-bug
 
 The algorithm is controlled by being in a series of states `LOOK_TOWARDS`, `GOAL_SEEK`, `WALL_FOLLOW`, `ROTATE_TO_VINES` and `HOMING_BEACON`.
 
-<p align="center"><img src="images/state_control.png"></p>
+<p align="center"><img src="images/state_control.png" style="width:500px;"></p>
 
-1. `LOOK_TOWARDS` - This state rotates the robot towards the `HOMING_BEACON` which can be placed anywhere in the vineyard. Rather than use single end point I have used a series of these to act as points to take images at. Once pointed towards the beacon the robot state will be changed to `GOAL_SEEK`.
+- `LOOK_TOWARDS` - This state rotates the robot towards the `HOMING_BEACON` which can be placed anywhere in the vineyard. Rather than use single end point I have used a series of these to act as points to take images at. Once pointed towards the beacon the robot state will be changed to `GOAL_SEEK`.
 
 <p align="center"><img src="images/look_towards.png"></p>
 
-1. `GOAL_SEEK` - This moves the robot towards the goal (homing beacon) and if it encounters any obstacle it will change state to `WALL_FOLLOW`. The collision proximity params here are slightly larger than at `WALL_FOLLOW` so we can avoid getting closed into position. 
+- `GOAL_SEEK` - This moves the robot towards the goal (homing beacon) and if it encounters any obstacle it will change state to `WALL_FOLLOW`. The collision proximity params here are slightly larger than at `WALL_FOLLOW` so we can avoid getting closed into position. 
 
 <p align="center"><img src="images/goal_seek.png"></p>
 
-1. `WALL'_FOLLOW` - This state moves the robot out of a collision area and will keep going until it intersects with the BUG2 `GOAL"_SEEK` line. It will then move to state `LOOK_TOWARDS` to again go to the `HOMING_BEACON`
+- `WALL'_FOLLOW` - This state moves the robot out of a collision area and will keep going until it intersects with the BUG2 `GOAL"_SEEK` line. It will then move to state `LOOK_TOWARDS` to again go to the `HOMING_BEACON`
 
 <p align="center"><img src="images/wall_follow.png"></p>
 
-1. `ROTATE_TO"_VINES` - Once at the goal position, the robot will change state and rotate towards the vines ensuring that the KinectHD camera is facing the vines at 90 degrees (assumes the vine hedge is parallel to the perimeter wall - checks have shown it is)
+- `ROTATE_TO"_VINES` - Once at the goal position, the robot will change state and rotate towards the vines ensuring that the KinectHD camera is facing the vines at 90 degrees (assumes the vine hedge is parallel to the perimeter wall - checks have shown it is)
 
 <p align="center"><img src="images/rotate_to_vines.png"></p>
 
-1. `HOMING_BEACON` - The homing beacon brings the activities above together by giving them a target to move towards. This target is the location for an image to be taken, but could with little adjustment could be at the end of a vineyard, ensuring that the robot safely traverses all obstacles while running along vine rows towards its destination [*Note: BUG1 will fully traverse a full row and BUG2 will traverse up to the closest point tof the goal, then move off the wall/vine to the next one*]
+- `HOMING_BEACON` - The homing beacon brings the activities above together by giving them a target to move towards. This target is the location for an image to be taken, but could with little adjustment could be at the end of a vineyard, ensuring that the robot safely traverses all obstacles while running along vine rows towards its destination [*Note: BUG1 will fully traverse a full row and BUG2 will traverse up to the closest point tof the goal, then move off the wall/vine to the next one*]
 
 <p align="center"><img src="images/homing_beacon.png"></p>
 
-1. `TAKE_IMAGE` - Once at the desired position we move to the `TAKE_IMAGE` state where the grape bunch counting process will begin.
+1 `TAKE_IMAGE` - Once at the desired position we move to the `TAKE_IMAGE` state where the grape bunch counting process will begin.
 
 Once we are at the correct position and angle to take an image the counting process takes over. 
 
