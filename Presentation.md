@@ -103,7 +103,7 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 <p align="center"><img src="images/detect_grapes.png" style="width:700px;"></p>
 
 
-### Comparison Grapevine Bunch Images aross Different Worlds
+### Further Grapevine Bunch Images from across Different Worlds
 
 *HSV Image (Vineyard Small) and Keypoints Image (Vineyard Small):*
 
@@ -146,31 +146,4 @@ To roll out this solution to a real world environment the following consideratio
 1. <b>wall_follow</b> - The obstacle avoidance process was married with the wall_follow state. However, this meant that extra time was taken navigating the perimeter of the vineyard. This could force the system to get into a loop where the robot could not escape or areas become inaccessible as it would never navigate to these points unless co-opted.
 
 1. <b>masking</b> - Masking was extremely useful, however this assumed constant conditions. Case-Switch statements could offer various code paths (or taking params out of a launch file), however these would at best be averages. Updating the system to detect features other than colour would offer improved counting performance across seasonality, weather or lighting conditions. 
-
-
-
-
-
-
-
-
-## What makes the problem hard
-
-Several aspects of the challenge provided require consideration:
-
-1. Occlusion
-
-1. Lighting
-
-1. Lighting direction
-
-1. Colour Gradients of greens
-
-1. Size of grapes
-
-1. Variation on colour of grapes
-
-1. Shadows
-
-1. etc ...
 
