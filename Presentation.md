@@ -151,9 +151,9 @@ To roll out this solution to a real world environment the following consideratio
 
 1. <b>Transition from odometry to lidar based navigation</b> - for squaring up we could check angles (say 15 degrees either side of closest  contact point) to identify if they are the same value. If they are then the robot is square, if not, then rotate accordingly.  
 
-1. <b>Lidar scans</b> - I utilised a wall following technique using Lidar. I reduced the field of View and tried to increase the density of the scan over a shorter field. However, scan points will traverse through the hedge making lidar unpredictable if wall following a vine row. Physical markers may be required within the environment. 
+1. <b>Lidar scans</b> - I utilised a wall following technique using Lidar. I reduced the Field of View (FoV) and tried to increase the density of the scan over a shorter field. However, scan points will traverse through the hedge making lidar unpredictable if wall following a vine row. Physical markers may be required within the environment. 
 
-1. <b>Front facing camera</b> - The front facing camera was deployed however constantly rotating the robot towards the vine would cause divots in the surrounding ground area. GThis would, over time, impact positioning and eventually imaging. Utilizing the side facing cameras could reduce this issue. 
+1. <b>Front facing camera</b> - The front facing camera was deployed however constantly rotating the robot towards the vine would cause divots in the surrounding ground area. This would, over time, impact positioning and eventually imaging. Utilizing the side facing cameras could reduce this issue. 
 
 1. <b>Multi-robot</b> - The system is not yet suitable for multi-robot systems. Seperate arena's would be required at the current stage of development. The messaging would need to be improved and subscriptions managed to ensure robots did not repeat tasks. 
 
@@ -164,7 +164,7 @@ https://user-images.githubusercontent.com/44243266/151898192-6909ea82-058c-485f-
 
 1. <b>State system</b> - Several scenarios can bring about the state system getting caught in a loop and never leaving to goal_seek.  
 
-1. <b>SimpleBlobDetector</b> - I would have focused efforts onto detecting the actual berries using their features that are not dependent upon their colour. Aspects such as curve and shape could have been used to transition against a leaf or identifying other berries around them (i.e. the bunch). 
+1. <b>SimpleBlobDetector</b> - I would have focused efforts onto detecting the actual berries using their features that are not dependent upon their colour or contour. Aspects such as curve and shape could have been used to transition against a leaf or identifying other berries around them (i.e. the bunch). 
 
 1. <b>homing_beacons</b> - The homing_beacons concept initially resolved speed issues however as the field grows time to create a suitable homing_beacon map of could have been spent by the robot performing SLAM or localising through a grid of way_points.
 
