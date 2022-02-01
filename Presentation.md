@@ -21,7 +21,7 @@ The key aspect of the project the was to complete the counting as accurately and
 
 A demonstration video is presented below showing how the Thorvald robot gets out of tight spaces to achieve a target goal point, from an initial constrained pose,to take an image of a grape vine. This is achieved by placing a homing_beacon at a required image point. Several homing_beacons can potentially be deployed to achieve as much coverage of the vine rows as required.
 
-https://user-images.githubusercontent.com/44243266/151281704-73a649ef-53f7-4e6f-acfe-41f06cd72c3c.mp4
+https://user-images.githubusercontent.com/44243266/151899734-6794c45a-fb0f-469b-b37a-3f39724f75e9.mp4
 
 
 ## Pre-Condition's Required
@@ -72,6 +72,8 @@ Once we are at the correct position and angle to take an image the counting proc
 ## Grape Bunch Counting Process Pipeline
 
 The grape bunch counting process is achieved through an imaging pipeline, using OpenCV. The pipeline is summarized below with an example for each stage of the process shown below:
+
+*Note: Read L->R*
 
 <p float="left">
   <img src="images/stage_1.png" width="33%" height="300px" />
