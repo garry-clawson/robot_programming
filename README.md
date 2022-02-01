@@ -24,9 +24,52 @@ https://user-images.githubusercontent.com/44243266/151281704-73a649ef-53f7-4e6f-
 
 The following are the steps required to run and launch this project. You will need a GitHub account for best management of your files and also be familiar with the Git command lines tools and terminal. You will need Ubuntu 18.04 to run this project due to ROS requirements.
 
-1. Make sure you are upto date and run `sudo apt-get update && sudo apt-get upgrade`
+1. Make sure your system is upto date by running `sudo apt-get update && sudo apt-get upgrade`
 
 1. Fork the `LCAS/CMP9767M` project from [https://github.com/LCAS/CMP9767M](https://github.com/LCAS/CMP9767M) as described in the [LCAS Wiki](https://github.com/LCAS/CMP9767M/wiki/Workshop-1---Introduction-and-ROS-Basics)
+
+1. Install the following packages:
+
+```
+sudo apt-get install \
+    ros-melodic-opencv-apps \
+    ros-melodic-rqt-image-view \
+    ros-melodic-uol-cmp9767m-base \
+    ros-melodic-find-object-2d \
+    ros-melodic-video-stream-opencv \
+    ros-melodic-topic-tools \
+    ros-melodic-rqt-tf-tree
+    ros-melodic-opencv-apps \
+    ros-melodic-rqt-image-view \
+    ros-melodic-image-geometry \
+    ros-melodic-uol-cmp9767m-base \
+    ros-melodic-uol-cmp9767m-tutorial \
+    ros-melodic-find-object-2d \
+    ros-melodic-video-stream-opencv \
+    ros-melodic-image-view
+    ros-melodic-robot-localization \
+    ros-melodic-thorvald \
+    ros-melodic-velodyne-description \
+    ros-melodic-kinect2-description \
+    ros-melodic-topological-navigation \
+    ros-melodic-teleop-tools \
+    ros-melodic-amcl
+    ros-melodic-robot-localization \
+    ros-melodic-topological-navigation \
+    ros-melodic-amcl \
+    ros-melodic-fake-localization \
+    ros-melodic-carrot-planner
+    ros-melodic-topological-utils \
+    ros-melodic-topological-navigation \
+    ros-melodic-topological-navigation-msgs \
+    ros-melodic-strands-navigation
+    ros-melodic-gmapping
+```
+You should then source your terminal by running:
+
+`source /opt/ros/melodic/setup.bash`
+
+*Note: You can also add this to your '~/.bashrc' file by pasting the above commend at the bottom. This will automatically configure the source for each new terminal you are starting. Within ROS you can have upwards of 5-7 terminals open at once, so this is very useful.*
 
 1. Create a catkin_ws by following the fantastic [ROS catkin tutorials](http://wiki.ros.org/catkin/Tutorials/create_a_workspace)
 
@@ -35,6 +78,8 @@ The following are the steps required to run and launch this project. You will ne
 1. Create a folder called `grape_bunch_counter` within your `catkin_ws/src` folder. Fork the contents of this [robot_programming](https://github.com/garry-clawson/robot_programming) repository and clone into the `grape_bunch_counter` folder (this will be your *package* for the project). *Note: The `images` folder is not required and can be deleted and is only used for this README.md document.* 
 
 1. Now you have all the files you require to run the project. We need to complete the `catkin_make` process. To do this `roscd` to get the head of the files, then `cd ..` out of the `devel` folder. You should now be in the `catkin_ws` folder.  Use `catkin_make` to build your project.
+
+1. A nice way to see if this has been successfull is to type `roslaunch` then double tab and you should see the package, `grape_bunch_counter`, as an option. Another double tab should then show, `grape_bunch_counter.launch`.
 
 
 ### Update Hokuyo Sensor Profile

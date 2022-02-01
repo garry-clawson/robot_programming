@@ -160,9 +160,11 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
  catkin_install_python(PROGRAMS
-   scripts/robot_move.py
-   scripts/image_saver.py
-   scripts/opencv_test.py
+   scripts/grape_bunch_counter.py
+   scripts/homing_beacon.py
+   #scripts/robot_move.py
+   #scripts/image_saver.py
+   #scripts/opencv_test.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
