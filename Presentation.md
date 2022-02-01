@@ -92,14 +92,14 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 
 ### Grape Bunch Counting Process Pipeline
 
-HSV Image (Vineyard Small) and Keypoints Image (Vineyard Small):
+*HSV Image (Vineyard Small) and Keypoints Image (Vineyard Small):*
 
 <p float="left">
   <img src="images/HSVimage.png" width="48%" height="300px" />
   <img src="/images/Counted_grape_bunches.png" width="48%" height="300px" /> 
 </p>
 
-HSV Image (Vineyard Stahe 4 Small) and Keypoints Image (Vineyard Stage 4 Small):
+*HSV Image (Vineyard Stahe 4 Small) and Keypoints Image (Vineyard Stage 4 Small):*
 
 <p float="left">
   <img src="images/st4_small.jpg" width="48%" height="300px" />
