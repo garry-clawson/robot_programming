@@ -30,7 +30,7 @@ https://user-images.githubusercontent.com/44243266/151281704-73a649ef-53f7-4e6f-
 
 1. Orientation of the crops can be in either in the longitudinal or horizontal direction, as long as the `HOMING_BEACON` points are positioned 2m from the vine hedge (to ensure images are not cropped).
 
-1. Odometry messages are subscribed to, to maintain the orientation of the ThorVald. Testing on the course ground has shown few repeatability (variance of 5%) issues when taking images and counting the grape bunches. 
+1. Odometry messages are subscribed to, to maintain the orientation of the Thorvald. Testing on the course ground has shown few repeatability (variance of circa 5%) issues when taking images and counting the grape bunches. 
 
 1. The perimeter wall is required as the program utililises the BUG2 wall follower algorithm for obstacle avoidance.
 
@@ -134,6 +134,10 @@ To roll out this solution to a real world environment the following consideratio
 1. <b>Lidar scans</b> - I utilised a wall following technique using Lidar. I reduced the field of View and tried to increase the density of the scan over a shorter field. However, scan points will traverse through the hedge making lidar unpredictable if wall following a vine row. Physical markers may be required within the environment. 
 
 1. <b>Front facing camera</b> - The front facing camera was deployed however constantly rotating the robot towards the vine would cause divots in the surrounding ground area. GThis would, over time, impact positioning and eventually imaging. Utilizing the side facing cameras could reduce this issue. 
+
+
+https://user-images.githubusercontent.com/44243266/151898192-6909ea82-058c-485f-96d0-fdc5cb6c976e.mov
+
 
 ### Software Concept
 
