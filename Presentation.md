@@ -81,7 +81,11 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 1. We then use `cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))` to apply an elliptical shape to a following morphologyEx process
 1. `cv2.morphologyEx(vinemask_updated, cv2.MORPH_OPEN, kernel)` to open the pixels to create larger centroid regions. The kernel size is critical here and we use 5,5. 7,7 opened up the image to far relative to distance image was being taken at and results were poor.
 
-<p align="center"><img src="images/rotate_to_vines.png"></p>
+<p float="left">
+  <img src="images/remove_background.png" width="48%" height="300px" />
+  <img src="/images/remove_vines.png" width="48%" height="300px" /> 
+</p>
+
 
 #### The following stage of the pipeline uses the `cv2.SimpleBlobDetector` to detect the grapes:
 
@@ -90,6 +94,8 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 1. `keypoints = detector.detect(grape_bunch_mask)`, creates a detector object and identifies keypoints in the image to our previously set params.
 1. `cv2.drawKeypoints(image, keypoints, np.array([]), (000,000,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)` draws the keypoints onto the image. There is a helper function within the file to save the any images to your local directory. 
 1. The final step is the accumulation of the `keypoints` count. We do this for the images taken across the length of the vine and sum the total bunches (keypoints identified in each image) found for a total count of grape bunches. We display this to the terminal for the user.
+
+<p align="center"><img src="images/detect_grapes" style="width:700px;"></p>
 
 
 ### Grape Bunch Counting Process Pipeline
@@ -134,7 +140,7 @@ To roll out this solution to a real world environment the following consideratio
 
 1. <b>wall_follow</b> - The obstacle avoidance process was married with the wall_follow state. However, this meant that extra time was taken navigating the perimeter of the vineyard. This could force the system to get into a loop where the robot could not escape or areas become inaccessible as it would never navigate to these points unless co-opted.
 
-1. <b>masking</b> - Masking was extremely useful, however this assumed constant conditions. Case-Switch statements could offer various code paths however these would at best be averages. Updating the system to detect features other than colour would offer improved counting performance across seasonality, weather or lighting conditions. 
+1. <b>masking</b> - Masking was extremely useful, however this assumed constant conditions. Case-Switch statements could offer various code paths (or taking params out of a launch file), however these would at best be averages. Updating the system to detect features other than colour would offer improved counting performance across seasonality, weather or lighting conditions. 
 
 
 
