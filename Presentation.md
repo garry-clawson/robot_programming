@@ -110,11 +110,21 @@ HSV Image (Vineyard Stahe 4 Small) and Keypoints Image (Vineyard Stage 4 Small):
 - Note: It can be seen that the LHS border grape bunch is not identified. This is due to the border constraint applied in the `cv2.SimpleBlobDetector` process, as this object would have been detected on a previously taken image as the robot traversed to homing_beacon points positioned along the row. 
 
 
+## Reflections on Solution
 
+To roll out this solution to a real world environment the following considerations would need to take place. 
 
+### Physical
 
+1. Transition from odomtry to lidar based navigation - for squaring up we could check angles (say 15 degrees either side of closest  contact point) to identify if they are the same value. If they are then the robot is square, if not, then rotate accordingly.  
 
+1. Lidar scans - I utilised a wall following technique using Lidar. I reduced the field of View and tried to increase the density of the scan over a shorter field. However, scan points will traverse through the hedge making lidar unpredictable if wall following a vine row. Physical markers may be required within the environment. 
 
+1. Front facing camera - The front facing camera was deployed however constantly rotating the robot towards the vine would cause divots in the surrounding ground area. GThis would, over time, impact positioning and eventually imaging. Utilizing the side facing cameras could reduce this issue. 
+
+### Software Concept
+
+1. 
 
 
 
