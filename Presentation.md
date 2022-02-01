@@ -17,7 +17,7 @@ This repository contains the simulation of a vineyard with the challenge to coun
 
 The navigation for this project uses a homing beacon system to get to a position, and the BUG2 algorithm to avoid any collisions as the robot traverses through the vineyard. 
 
-The key aspect of the project the was to complete the counting as accurately and as quickly as possible. With this in mind I opted to not localize or map the environment. Key characteristics are known upfront such as rows will run adjacent to one another, they will be bordered by a barrier and growing stages will be the same throughout the vineyard. 
+The key aspect of the project the was to complete the counting as accurately and as quickly as possible. Key characteristics are known upfront such as rows will run adjacent to one another, they will be bordered by a barrier and growing stages will be the same throughout the vineyard. 
 
 A demonstration video is presented below showing how the Thorvald robot gets out of tight spaces to achieve a target goal point, from an initial constrained pose,to take an image of a grape vine. This is achieved by placing a homing_beacon at a required image point. Several homing_beacons can potentially be deployed to achieve as much coverage of the vine rows as required.
 
