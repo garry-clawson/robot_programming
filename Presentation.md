@@ -103,10 +103,7 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 <p align="center"><img src="images/detect_grapes.png" style="width:700px;"></p>
 
 
-### Grape Bunch Counting Process Pipeline
-
-
-### Grape Bunch Counting Process Pipeline
+### Comparison Grapevine Bunch Images aross Different Worlds
 
 *HSV Image (Vineyard Small) and Keypoints Image (Vineyard Small):*
 
