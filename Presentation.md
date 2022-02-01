@@ -62,7 +62,7 @@ The systems is controlled by utlising in a series of states `LOOK_TOWARDS`, `GOA
 
 <p align="center"><img src="images/rotate_to_vines.png" style="width:700px;"></p>
 
-- `HOMING_BEACON` - The homing beacon brings the activities above together by giving them a target position to move towards. This publishes the `PoseStamped.msg` for subscription. This target currently being the location for an image to be taken. However, amending this target to be at the end of a vineyard, the robot could safely traverses all obstacles while running along vine rows towards its destination taking images governed by odometry or Lidar positioning constraints [*Note: BUG1 will fully traverse a full row and BUG2 will traverse up to the closest point nearest the goal, then move off the wall/vine to twards its target.*]
+- `HOMING_BEACON` - The homing beacon brings the activities above together by giving them a target position to move towards. This publishes the `PoseStamped.msg` for subscription. This target currently being the location for an image to be taken. However, amending this target to be at the end of a vineyard, the robot could safely traverses all obstacles while running along vine rows towards its destination taking images governed by odometry or Lidar positioning constraints [*Note: BUG1 will fully traverse a full row and BUG2 will traverse up to the nearest leave point for the goal, then move off the wall/vine to towards its target.*]
 
 <p align="center"><img src="images/homing_beacon.png" style="width:700px;"></p>
 
