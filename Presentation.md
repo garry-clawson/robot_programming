@@ -71,7 +71,12 @@ Once we are at the correct position and angle to take an image the counting proc
 
 ## Grape Bunch Counting Process Pipeline
 
-The grape bunch counting process is achieved through an imaging pipeline, using OpenCV, as follows:
+The grape bunch counting process is achieved through an imaging pipeline, using OpenCV. The pipeline is summarized below with an example for each stage of the process shown below:
+
+<p align="center"><img src="images/image_pipeline.png"></p>
+
+
+#### The masking process stage of the pipeline to remove non needed components
 
 1. `CV bridge`: This connects/links OpenCV to ROS
 2. `cv2.cvtColor(image, cv2.COLOR_BGR2HSV)`: Convert to HSV image, apply thresholds then mask. A useful threshold tool is the [blob_detector.py](https://github.com/tizianofiorenzani/ros_tutorials/blob/master/opencv/include/blob_detector.py) by Tiziano Fiorenzani.
@@ -96,6 +101,9 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 1. The final step is the accumulation of the `keypoints` count. We do this for the images taken across the length of the vine and sum the total bunches (keypoints identified in each image) found for a total count of grape bunches. We display this to the terminal for the user.
 
 <p align="center"><img src="images/detect_grapes.png" style="width:700px;"></p>
+
+
+### Grape Bunch Counting Process Pipeline
 
 
 ### Grape Bunch Counting Process Pipeline
