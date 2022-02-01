@@ -73,7 +73,7 @@ Once we are at the correct position and angle to take an image the counting proc
 
 ## Grape Bunch Counting Process Pipeline
 
-The grape bunch counting process is achieved through an imaging pipeline, using OpenCV. The pipeline is summarized below with an example for each stage of the process shown below:
+The grape bunch counting process is achieved through an imaging pipeline, using OpenCV. There are two stages, the first being to mask the required grape bunches, then the second being to detect the masked features. The pipeline is summarized below with an example for each stage of the process shown below:
 
 *Note: Read L->R*
 
@@ -115,7 +115,7 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 #### The following stage of the pipeline uses the `cv2.SimpleBlobDetector` to detect the grapes:
 
 1. `cv2.copyMakeBorder(grape_bunch_mask, top=1, bottom=1, left=1, right=0, borderType= cv2.BORDER_CONSTANT, value=[255,255,255] )` to add a small border to the top, bottom, left but not the right hand side *(see Kinect Camera offset to Vines details for why)*
-1. `cv2.SimpleBlobDetector_Params`, we add the required parameters. Some params are set as default so need ot be adjust to ensure we can identify the shapes of the grape bunches (and not just circles (circularity) for example). These params were discovered through trial and error across a range of images and lighting conditions, but only on 1 x compute resource. Deploying on alternative compute resources may require some amendment to these thresholds as well as HSV thresholds. 
+1. `cv2.SimpleBlobDetector_Params`, we add the required parameters. Some params are set as default so need ot be adjust to ensure we can identify the shapes of the grape bunches (and not just circles (circularity) for example). These params were discovered through trial and error across a range of images and robot placements, but only on 1 x compute resource. 
 1. `keypoints = detector.detect(grape_bunch_mask)`, creates a detector object and identifies keypoints in the image to our previously set params.
 1. `cv2.drawKeypoints(image, keypoints, np.array([]), (000,000,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)` draws the keypoints onto the image. There is a helper function within the file to save the any images to your local directory. 
 1. The final step is the accumulation of the `keypoints` count. We do this for the images taken across the length of the vine and sum the total bunches (keypoints identified in each image) found for a total count of grape bunches. We display this to the terminal for the user.
