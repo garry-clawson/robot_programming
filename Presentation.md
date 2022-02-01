@@ -30,11 +30,11 @@ https://user-images.githubusercontent.com/44243266/151899734-6794c45a-fb0f-469b-
 
 1. Orientation of the crops can be in either in the longitudinal or horizontal direction, as long as the `HOMING_BEACON` points are positioned 2m from the vine hedge (to ensure images are not cropped).
 
-1. Odometry messages are subscribed to, to maintain the orientation of the Thorvald. Testing on the course ground has shown few repeatability (variance of circa 5%) issues when taking images and counting the grape bunches. 
+1. Odometry messages are subscribed to, to maintain the orientation of the Thorvald. Testing across the multiple worlds has shown few repeatability (variance of circa 5%) issues when taking images and counting the grape bunches. However, in some instances, creep (robot edges to one side) has been shown effect the results as some grape bunches can drop off the image.
 
 1. The perimeter wall is required as the program utililises the BUG2 wall follower algorithm for obstacle avoidance.
 
-1. Detection of different growth stages throughout a single vineyard is not implemented in this solution. 
+1. Detection of different growth stages throughout a single vineyard is not implemented in this solution. Stage 0 vines are also not yet able to be detected due to their size and colouring. 
 
 ## Route Planning Overview
 
