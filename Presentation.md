@@ -81,6 +81,8 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 1. We then use `cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))` to apply an elliptical shape to a following morphologyEx process
 1. `cv2.morphologyEx(vinemask_updated, cv2.MORPH_OPEN, kernel)` to open the pixels to create larger centroid regions. The kernel size is critical here and we use 5,5. 7,7 opened up the image to far relative to distance image was being taken at and results were poor.
 
+<p align="center"><img src="images/rotate_to_vines.png"></p>
+
 #### The following stage of the pipeline uses the `cv2.SimpleBlobDetector` to detect the grapes:
 
 1. `cv2.copyMakeBorder(grape_bunch_mask, top=1, bottom=1, left=1, right=0, borderType= cv2.BORDER_CONSTANT, value=[255,255,255] )` to add a small border to the top, bottom, left but not the right hand side *(see Kinect Camera offset to Vines details for why)*
@@ -107,7 +109,7 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 </p>
 
 
-- Note: It can be seen that the LHS border grape bunch is not identified. This is due to the border constraint applied in the `cv2.SimpleBlobDetector` process, as this object would have been detected on a previously taken image as the robot traversed to homing_beacon points positioned along the row. 
+- <b>Note:</b> It can be seen that the LHS border grape bunch is not identified. This is due to the border constraint applied in the `cv2.SimpleBlobDetector` process, as this object would have been detected on a previously taken image as the robot traversed to homing_beacon points positioned along the row. 
 
 
 ## Reflections on Solution
