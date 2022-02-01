@@ -40,7 +40,9 @@ https://user-images.githubusercontent.com/44243266/151899734-6794c45a-fb0f-469b-
 
 Path planning uses the [BUG2 algorithm](https://automaticaddison.com/the-bug2-algorithm-for-robot-motion-planning/) and a homing beacon system to avoid collisions and get to required points for image taking. 
 
-The algorithm is controlled by being in a series of states `LOOK_TOWARDS`, `GOAL_SEEK`, `WALL_FOLLOW`, `ROTATE_TO_VINES` and `HOMING_BEACON`.
+The systems is controlled by utlising in a series of states `LOOK_TOWARDS`, `GOAL_SEEK`, `WALL_FOLLOW`, `ROTATE_TO_VINES` and `HOMING_BEACON`. The robot can only be one state at any one time. Alternation between states creates the robot activity.
+
+### State Review
 
 <p align="center"><img src="images/state_control.png" style="width:700px;"></p>
 
