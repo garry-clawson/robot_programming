@@ -60,7 +60,7 @@ The algorithm is controlled by being in a series of states `LOOK_TOWARDS`, `GOAL
 
 <p align="center"><img src="images/rotate_to_vines.png" style="width:700px;"></p>
 
-- `HOMING_BEACON` - The homing beacon brings the activities above together by giving them a target position to move towards. This target currently being the location for an image to be taken. However, amending this target to be at the end of a vineyard, the robot could safely traverses all obstacles while running along vine rows towards its destination taking images governed by odometry or Lidar positioning constraints [*Note: BUG1 will fully traverse a full row and BUG2 will traverse up to the closest point nearest the goal, then move off the wall/vine to twards its target.*]
+- `HOMING_BEACON` - The homing beacon brings the activities above together by giving them a target position to move towards. This publishes the 'POSE_STAMPED()' message for subscription. This target currently being the location for an image to be taken. However, amending this target to be at the end of a vineyard, the robot could safely traverses all obstacles while running along vine rows towards its destination taking images governed by odometry or Lidar positioning constraints [*Note: BUG1 will fully traverse a full row and BUG2 will traverse up to the closest point nearest the goal, then move off the wall/vine to twards its target.*]
 
 <p align="center"><img src="images/homing_beacon.png" style="width:700px;"></p>
 
@@ -153,7 +153,7 @@ To roll out this solution to a real world environment the following consideratio
 
 1. <b>Front facing camera</b> - The front facing camera was deployed however constantly rotating the robot towards the vine would cause divots in the surrounding ground area. GThis would, over time, impact positioning and eventually imaging. Utilizing the side facing cameras could reduce this issue. 
 
-1. <b>Multi-robot</b> - The system is not suitable to multi-robot systems. Seperate arena's would be required at the current stage of development.
+1. <b>Multi-robot</b> - The system is not yet suitable for multi-robot systems. Seperate arena's would be required at the current stage of development. The messaging would need to be improved and subscriptions managed to ensure robots did not repeat tasks. 
 
 https://user-images.githubusercontent.com/44243266/151898192-6909ea82-058c-485f-96d0-fdc5cb6c976e.mov
 
