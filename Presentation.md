@@ -95,7 +95,7 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 1. `cv2.drawKeypoints(image, keypoints, np.array([]), (000,000,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)` draws the keypoints onto the image. There is a helper function within the file to save the any images to your local directory. 
 1. The final step is the accumulation of the `keypoints` count. We do this for the images taken across the length of the vine and sum the total bunches (keypoints identified in each image) found for a total count of grape bunches. We display this to the terminal for the user.
 
-<p align="center"><img src="images/detect_grapes" style="width:700px;"></p>
+<p align="center"><img src="images/detect_grapes.png" style="width:700px;"></p>
 
 
 ### Grape Bunch Counting Process Pipeline
