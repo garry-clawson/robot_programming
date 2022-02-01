@@ -73,7 +73,23 @@ Once we are at the correct position and angle to take an image the counting proc
 
 The grape bunch counting process is achieved through an imaging pipeline, using OpenCV. The pipeline is summarized below with an example for each stage of the process shown below:
 
-<p align="center"><img src="images/image_pipeline.png"></p>
+<p float="left">
+  <img src="images/stage_1.png" width="33%" height="300px" />
+  <img src="/images/stage_2.png" width="33%" height="300px" /> 
+  <img src="/images/stage_3.png" width="33%" height="300px" /> 
+</p>
+
+<p float="left">
+  <img src="images/stage_4.png" width="33%" height="300px" />
+  <img src="/images/stage_5.png" width="33%" height="300px" /> 
+  <img src="/images/stage_6.png" width="33%" height="300px" /> 
+</p>
+
+<p float="left">
+  <img src="images/stage_7.png" width="33%" height="300px" />
+  <img src="/images/stage_8.png" width="33%" height="300px" /> 
+  <img src="/images/stage_9.png" width="33%" height="300px" /> 
+</p>
 
 
 #### The masking process stage of the pipeline to remove non needed components
