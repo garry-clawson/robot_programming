@@ -153,7 +153,7 @@ To roll out this solution to a real world environment the following consideratio
 
 1. <b>Front facing camera</b> - The front facing camera was deployed however constantly rotating the robot towards the vine would cause divots in the surrounding ground area. GThis would, over time, impact positioning and eventually imaging. Utilizing the side facing cameras could reduce this issue. 
 
-1. <b>Multi-robot</> - The system is not suitable to multi-robot systems. Seperate arena's would be required at the current stage of development.
+1. <b>Multi-robot</b> - The system is not suitable to multi-robot systems. Seperate arena's would be required at the current stage of development.
 
 https://user-images.githubusercontent.com/44243266/151898192-6909ea82-058c-485f-96d0-fdc5cb6c976e.mov
 
