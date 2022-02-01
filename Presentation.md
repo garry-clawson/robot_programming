@@ -81,7 +81,7 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
 1. We then use `cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))` to apply an elliptical shape to a following morphologyEx process
 1. `cv2.morphologyEx(vinemask_updated, cv2.MORPH_OPEN, kernel)` to open the pixels to create larger centroid regions. The kernel size is critical here and we use 5,5. 7,7 opened up the image to far relative to distance image was being taken at and results were poor.
 
-The following stage of the pipeline uses the `cv2.SimpleBlobDetector` to detect the grapes:
+#### The following stage of the pipeline uses the `cv2.SimpleBlobDetector` to detect the grapes:
 
 1. `cv2.copyMakeBorder(grape_bunch_mask, top=1, bottom=1, left=1, right=0, borderType= cv2.BORDER_CONSTANT, value=[255,255,255] )` to add a small border to the top, bottom, left but not the right hand side *(see Kinect Camera offset to Vines details for why)*
 1. `cv2.SimpleBlobDetector_Params`, we add the required parameters. Some params are set as default so need ot be adjust to ensure we can identify the shapes of the grape bunches (and not just circles (circularity) for example). These params were discovered through trial and error across a range of images and lighting conditions, but only on 1 x compute resource. Deploying on alternative compute resources may require some amendment to these thresholds as well as HSV thresholds. 
@@ -116,15 +116,15 @@ To roll out this solution to a real world environment the following consideratio
 
 ### Physical
 
-1. Transition from odomtry to lidar based navigation - for squaring up we could check angles (say 15 degrees either side of closest  contact point) to identify if they are the same value. If they are then the robot is square, if not, then rotate accordingly.  
+1. <b>Transition from odometry to lidar based navigation</b> - for squaring up we could check angles (say 15 degrees either side of closest  contact point) to identify if they are the same value. If they are then the robot is square, if not, then rotate accordingly.  
 
-1. Lidar scans - I utilised a wall following technique using Lidar. I reduced the field of View and tried to increase the density of the scan over a shorter field. However, scan points will traverse through the hedge making lidar unpredictable if wall following a vine row. Physical markers may be required within the environment. 
+1. <b>Lidar scans</b> - I utilised a wall following technique using Lidar. I reduced the field of View and tried to increase the density of the scan over a shorter field. However, scan points will traverse through the hedge making lidar unpredictable if wall following a vine row. Physical markers may be required within the environment. 
 
-1. Front facing camera - The front facing camera was deployed however constantly rotating the robot towards the vine would cause divots in the surrounding ground area. GThis would, over time, impact positioning and eventually imaging. Utilizing the side facing cameras could reduce this issue. 
+1. <b>Front facing camera</b> - The front facing camera was deployed however constantly rotating the robot towards the vine would cause divots in the surrounding ground area. GThis would, over time, impact positioning and eventually imaging. Utilizing the side facing cameras could reduce this issue. 
 
 ### Software Concept
 
-1. 
+1. <b>State system</b> - Several scenarios can bring about the state system getting caught in a loop and never leaving to goal_seek.  
 
 
 
