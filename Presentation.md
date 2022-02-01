@@ -99,7 +99,7 @@ The grape bunch counting process is achieved through an imaging pipeline, using 
   <img src="/images/Counted_grape_bunches.png" width="48%" height="300px" /> 
 </p>
 
-*HSV Image (Vineyard Stahe 4 Small) and Keypoints Image (Vineyard Stage 4 Small):*
+*HSV Image (Vineyard Stage 4 Small) and Keypoints Image (Vineyard Stage 4 Small):*
 
 <p float="left">
   <img src="images/st4_small.jpg" width="48%" height="300px" />
@@ -126,9 +126,13 @@ To roll out this solution to a real world environment the following consideratio
 
 1. <b>State system</b> - Several scenarios can bring about the state system getting caught in a loop and never leaving to goal_seek.  
 
+1. <b>SimpleBlobDetector</b> - I would have focused efforts onto detecting the actual berries using their features that are not dependent upon their colour. Aspects such as curve and shape could have been used to transition against a leaf or identifying other berries around them (i.e. the bunch). 
 
+1. <b>homing_beacons</b> - The homing_beacons concept initially resolved speed issues however as the field grows time to create a suitable homing_beacon map of could have been spent by the robot performing SLAM or localising through a grid of way_points.
 
+1. <b>wall_follow</b> - The obstacle avoidance process was married with the wall_follow state. However, this meant that extra time was taken navigating the perimeter of the vineyard. This could force the system to get into a loop where the robot could not escape or areas become inaccessible as it would never navigate to these points unless co-opted.
 
+1. <b>masking</b> - Masking was extremely useful, however this assumed constant conditions. Case-Switch statements could offer various code paths however these would at best be averages. Updating the system to detect features other than colour would offer improved counting performance across seasonality, weather or lighting conditions. 
 
 
 
