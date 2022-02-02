@@ -141,16 +141,27 @@ The distance to the vines is correlated to the field of view of the Kinect_v2 ca
 
 The images are taken from right through left. As part of the process we use `cv2.SimpleBlobDetector`. The simple blob detector ignores keypoints on the boundary so a border was created with the right side of the border removed (so anything on the RHS would not be counted if it fell on the this line). As the robot moves down the vine row, anything missed out on the RHS is captured on the LHS image. This avoids the issue of double counting boundary grape bunches as long as we are careful with our positioning; however robot distance to hedge and camera FoV should be as accurate as possible to get sensible results.
 
-### Images Showing Example Grape Bunch Count
+### Image Pipeline for Grape Bunch Counting
+ 
+*Note: Read L->R*
 
-HSV Image:
+<p float="left">
+  <img src="images/stage_1.png" width="33%" height="300px" />
+  <img src="/images/stage_2.png" width="33%" height="300px" /> 
+  <img src="/images/stage_3.png" width="33%" height="300px" /> 
+</p>
 
-<p align="center"><img src="images/HSVimage.png"></p>
+<p float="left">
+  <img src="images/stage_4.png" width="33%" height="300px" />
+  <img src="/images/stage_5.png" width="33%" height="300px" /> 
+  <img src="/images/stage_6.png" width="33%" height="300px" /> 
+</p>
 
-Keypoints Image:
-
-<p align="center"><img src="images/Counted_grape_bunches.png"></p>
-
+<p float="left">
+  <img src="images/stage_7.png" width="33%" height="300px" />
+  <img src="/images/stage_8.png" width="33%" height="300px" /> 
+  <img src="/images/stage_9.png" width="33%" height="300px" /> 
+</p>
 
 ## Route Planning Overview
 
