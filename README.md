@@ -63,7 +63,6 @@ sudo apt-get install \
     ros-melodic-topological-navigation \
     ros-melodic-topological-navigation-msgs \
     ros-melodic-strands-navigation
-    ros-melodic-gmapping
 ```
 You should then source your terminal by running:
 
